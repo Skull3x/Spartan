@@ -1556,9 +1556,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		}
 
 		foreach($this->server->getOnlinePlayers() as $p){
-			if($p->getUniqueId()->equals($this->getUniqueId())){
-				if($this->kick("Already logged in!") === false){
-					$p->close($this->getLeaveMessage(), "Logged in from another location");
+			if($this->getName() === $p->getName()){
+				if($p->kick("Logged in from another location!") === false){
+					$this->close($this->getLeaveMessage(), "Already logged in!");
 					return;
 				}
 			}
