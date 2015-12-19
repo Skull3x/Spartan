@@ -23,34 +23,36 @@ namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
-
-use pocketmine\entity\Attribute;
-
 class UpdateAttributesPacket extends DataPacket{
+        
 	const NETWORK_ID = Info::UPDATE_ATTRIBUTES_PACKET;
-
-
-	public $entityId;
-	/** @var Attribute[] */
-	public $entries = [];
-
+        
+        const HEALTH = "generic.health";
+        const HUNGER = "player.hunger";
+        const EXPERIENCE = "player.experience";
+        const EXPERIENCE_LEVEL = "player.level";
+        
+        public $entityId;
+    
+        public $minValue;
+    
+        public $maxValue;
+    
+        public $value;
+    
+        public $name;
+    
 	public function decode(){
-
+                
 	}
-
+        
 	public function encode(){
 		$this->reset();
-
 		$this->putLong($this->entityId);
-
-		$this->putShort(count($this->entries));
-
-		foreach($this->entries as $entry){
-			$this->putFloat($entry->getMinValue());
-			$this->putFloat($entry->getMaxValue());
-			$this->putFloat($entry->getValue());
-			$this->putString($entry->getName());
-		}
+		$this->putShort(1);
+                $this->putFloat($this->minValue);
+                $this->putFloat($this->maxValue);
+                $this->putFloat($this->value);
+                $this->putString($this->name);
 	}
-
 }

@@ -115,11 +115,11 @@ use pocketmine\network\protocol\PlayStatusPacket;
 use pocketmine\network\protocol\RespawnPacket;
 use pocketmine\network\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\protocol\TextPacket;
+use pocketmine\network\protocol\UpdateAttributesPacket;
 
 use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\network\protocol\SetDifficultyPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
-use pocketmine\network\protocol\SetHealthPacket;
 use pocketmine\network\protocol\SetSpawnPositionPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\network\protocol\StartGamePacket;
@@ -752,6 +752,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$pk = new PlayStatusPacket();
 		$pk->status = PlayStatusPacket::PLAYER_SPAWN;
 		$this->dataPacket($pk);
+                
+                $pk = new UpdateAttributesPacket();
+                $pk->minValue = 0;
+                $pk->maxValue = 20;
+                $pk->value = 16;
+                $pk->name = UpdateAttributesPacket::HUNGER;
+                $this->dataPacket($pk);
 
 		$this->server->getPluginManager()->callEvent($ev = new PlayerJoinEvent($this,
 			new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.joined", [
@@ -1335,60 +1342,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$newPos = $this->newPosition;
 		$distanceSquared = $newPos->distanceSquared($this);
 
-		$revert = false;
-
-		if(($distanceSquared / ($tickDiff ** 2)) > 100){
-			$revert = true;
-		}else{
-			if($this->chunk === null or !$this->chunk->isGenerated()){
-				$chunk = $this->level->getChunk($newPos->x >> 4, $newPos->z >> 4, false);
-				if($chunk === null or !$chunk->isGenerated()){
-					$revert = true;
-					$this->nextChunkOrderRun = 0;
-				}else{
-					if($this->chunk !== null){
-						$this->chunk->removeEntity($this);
-					}
-					$this->chunk = $chunk;
-				}
+		if($this->chunk === null or !$this->chunk->isGenerated()){
+			$chunk = $this->level->getChunk($newPos->x >> 4, $newPos->z >> 4, false);
+			if($this->chunk !== null){
+				$this->chunk->removeEntity($this);
 			}
-		}
-
-		if(!$revert and $distanceSquared != 0){
-			$dx = $newPos->x - $this->x;
-			$dy = $newPos->y - $this->y;
-			$dz = $newPos->z - $this->z;
-
-			$this->move($dx, $dy, $dz);
-
-			$diffX = $this->x - $newPos->x;
-			$diffY = $this->y - $newPos->y;
-			$diffZ = $this->z - $newPos->z;
-
-			$yS = 0.5 + $this->ySize;
-			if($diffY >= -$yS or $diffY <= $yS){
-				$diffY = 0;
-			}
-
-			$diff = ($diffX ** 2 + $diffY ** 2 + $diffZ ** 2) / ($tickDiff ** 2);
-
-			if($this->isSurvival()){
-				if(!$revert and !$this->isSleeping()){
-					if($diff > 0.0625){
-						$revert = true;
-						$this->server->getLogger()->warning($this->getServer()->getLanguage()->translateString("pocketmine.player.invalidMove", [$this->getName()]));
-					}
-				}
-			}
-
-			if($diff > 0){
-				$this->x = $newPos->x;
-				$this->y = $newPos->y;
-				$this->z = $newPos->z;
-				$radius = $this->width / 2;
-				$this->boundingBox->setBounds($this->x - $radius, $this->y, $this->z - $radius, $this->x + $radius, $this->y + $this->height, $this->z + $radius);
-			}
-		}
+			$this->chunk = $chunk;
+                }
 
 		$from = new Location($this->lastX, $this->lastY, $this->lastZ, $this->lastYaw, $this->lastPitch, $this->level);
 		$to = $this->getLocation();
@@ -1396,7 +1356,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$delta = pow($this->lastX - $to->x, 2) + pow($this->lastY - $to->y, 2) + pow($this->lastZ - $to->z, 2);
 		$deltaAngle = abs($this->lastYaw - $to->yaw) + abs($this->lastPitch - $to->pitch);
 
-		if(!$revert and ($delta > (1 / 16) or $deltaAngle > 10)){
+		if(($delta > (1 / 16) or $deltaAngle > 10)){
 
 			$isFirst = ($this->lastX === null or $this->lastY === null or $this->lastZ === null);
 
@@ -1412,8 +1372,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 				$this->server->getPluginManager()->callEvent($ev);
 
-				if(!($revert = $ev->isCancelled())){ //Yes, this is intended
-					if($to->distanceSquared($ev->getTo()) > 0.01){ //If plugins modify the destination
+				if(!($ev->isCancelled())){
+					if($to->distanceSquared($ev->getTo()) > 0.01){
 						$this->teleport($ev->getTo());
 					}else{
 						$this->level->addEntityMovement($this->x >> 4, $this->z >> 4, $this->getId(), $this->x, $this->y + $this->getEyeHeight(), $this->z, $this->yaw, $this->pitch, $this->yaw);
@@ -1429,23 +1389,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		}elseif($distanceSquared == 0){
 			$this->speed = new Vector3(0, 0, 0);
 		}
-
-		if($revert){
-
-			$this->lastX = $from->x;
-			$this->lastY = $from->y;
-			$this->lastZ = $from->z;
-
-			$this->lastYaw = $from->yaw;
-			$this->lastPitch = $from->pitch;
-
-			$this->sendPosition($from, $from->yaw, $from->pitch, 1);
-			$this->forceMovement = new Vector3($from->x, $from->y, $from->z);
-		}else{
-			$this->forceMovement = null;
-			if($distanceSquared != 0 and $this->nextChunkOrderRun > 20){
-				$this->nextChunkOrderRun = 20;
-			}
+                
+		$this->forceMovement = null;
+		if($distanceSquared != 0 and $this->nextChunkOrderRun > 20){
+			$this->nextChunkOrderRun = 20;
 		}
 
 		$this->newPosition = null;
@@ -1609,14 +1556,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		}
 
 		foreach($this->server->getOnlinePlayers() as $p){
-			if($p !== $this and strtolower($p->getName()) === strtolower($this->getName())){
-				if($p->kick("logged in from another location") === false){
-					$this->close($this->getLeaveMessage(), "Logged in from another location");
-					return;
-				}
-			}elseif($p->loggedIn and $this->getUniqueId()->equals($p->getUniqueId())){
-				if($p->kick("logged in from another location") === false){
-					$this->close($this->getLeaveMessage(), "Logged in from another location");
+			if($p->getUniqueId()->equals($this->getUniqueId())){
+				if($this->kick("Already logged in!") === false){
+					$p->close($this->getLeaveMessage(), "Logged in from another location");
 					return;
 				}
 			}
@@ -1716,10 +1658,15 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$pk->y = (int) $spawnPosition->y;
 		$pk->z = (int) $spawnPosition->z;
 		$this->dataPacket($pk);
-
-		$pk = new SetHealthPacket();
-		$pk->health = $this->getHealth();
-		$this->dataPacket($pk);
+                
+                $this->setHealth(20);
+                
+		$pk = new UpdateAttributesPacket();
+                $pk->minValue = 0;
+                $pk->maxValue = 20;
+                $pk->value = 16;
+                $pk->name = UpdateAttributesPacket::HUNGER;
+                $this->dataPacket($pk);
 
 		$pk = new SetDifficultyPacket();
 		$pk->difficulty = $this->server->getDifficulty();
@@ -2211,7 +2158,14 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 						$this->deadTicks = 0;
 						$this->noDamageTicks = 60;
 
-						$this->setHealth($this->getMaxHealth());
+						$this->setHealth(20);
+                                                
+                                                $pk = new UpdateAttributesPacket();
+                                                $pk->minValue = 0;
+                                                $pk->maxValue = 20;
+                                                $pk->value = 16;
+                                                $pk->name = UpdateAttributesPacket::HUNGER;
+                                                $this->dataPacket($pk);
 
 						$this->removeAllEffects();
 						$this->sendData($this);
@@ -3261,9 +3215,12 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	public function setHealth($amount){
 		parent::setHealth($amount);
 		if($this->spawned === true){
-			$pk = new SetHealthPacket();
-			$pk->health = $this->getHealth();
-			$this->dataPacket($pk);
+			$pk = new UpdateAttributesPacket();
+                        $pk->minValue = 0;
+                        $pk->maxValue = $this->getMaxHealth();
+                        $pk->value = $amount;
+                        $pk->name = UpdateAttributesPacket::HEALTH;
+                        $this->dataPacket($pk);
 		}
 	}
 

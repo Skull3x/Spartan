@@ -60,38 +60,50 @@ class MainLogger extends \AttachableThreadedLogger{
 	}
 
 	public function emergency($message){
-		$this->send($message, \LogLevel::EMERGENCY, "EMERGENCY", TextFormat::RED);
+                $this->server($message, Terminal::$COLOR_RED);
 	}
 
 	public function alert($message){
-		$this->send($message, \LogLevel::ALERT, "ALERT", TextFormat::RED);
+                $this->server($message, Terminal::$COLOR_GOLD);
 	}
 
 	public function critical($message){
-		$this->send($message, \LogLevel::CRITICAL, "CRITICAL", TextFormat::RED);
+                $this->server($message, Terminal::$COLOR_RED);
 	}
 
 	public function error($message){
-		$this->send($message, \LogLevel::ERROR, "ERROR", TextFormat::DARK_RED);
+                $this->server($message, Terminal::$COLOR_DARK_RED);
 	}
 
 	public function warning($message){
-		$this->send($message, \LogLevel::WARNING, "WARNING", TextFormat::YELLOW);
+                $this->server($message, Terminal::$COLOR_YELLOW);
 	}
 
 	public function notice($message){
-		$this->send($message, \LogLevel::NOTICE, "NOTICE", TextFormat::AQUA);
+                $this->server($message, Terminal::$COLOR_AQUA);
 	}
 
 	public function info($message){
-		$this->send($message, \LogLevel::INFO, "INFO", TextFormat::WHITE);
+                $this->server($message);
 	}
+        
+        public function server($message, $color = "\x1b[38;5;145m") {
+                $this->send($message, \LogLevel::INFO, Terminal::$COLOR_AQUA . "Server> " . $color, null);
+        }
+        
+        public function game($message, $color = "\x1b[38;5;145m") {
+                $this->send($message, \LogLevel::INFO, Terminal::$COLOR_LIGHT_PURPLE . "Game> " . $color, null);
+        }
+        
+        public function spartan($message, $color = "\x1b[38;5;145m") {
+                $this->send($message, \LogLevel::INFO, Terminal::$COLOR_GOLD . "Spartan> " . $color, null);
+        }
 
 	public function debug($message){
 		if($this->logDebug === false){
 			return;
 		}
-		$this->send($message, \LogLevel::DEBUG, "DEBUG", TextFormat::GRAY);
+                $this->server($message);
 	}
 
 	/**
@@ -178,7 +190,6 @@ class MainLogger extends \AttachableThreadedLogger{
 	}
 
 	protected function send($message, $level, $prefix, $color){
-		$now = time();
 
 		$thread = \Thread::getCurrentThread();
 		if($thread === null){
@@ -189,7 +200,7 @@ class MainLogger extends \AttachableThreadedLogger{
 			$threadName = (new \ReflectionClass($thread))->getShortName() . " thread";
 		}
 
-		$message = TextFormat::toANSI(TextFormat::AQUA . "[" . date("H:i:s", $now) . "] ". TextFormat::RESET . $color ."[" . $threadName . "/" . $prefix . "]:" . " " . $message . TextFormat::RESET);
+		$message = TextFormat::toANSI("$prefix" . " " . $message . TextFormat::RESET);
 		$cleanMessage = TextFormat::clean($message);
 
 		if(!Terminal::hasFormattingCodes()){
@@ -202,7 +213,7 @@ class MainLogger extends \AttachableThreadedLogger{
 			$this->attachment->call($level, $message);
 		}
 
-		$this->logStream[] = date("Y-m-d", $now) . " " . $cleanMessage . "\n";
+		$this->logStream[] = $cleanMessage . "\r\n\n";
 		if($this->logStream->count() === 1){
 			$this->synchronized(function(){
 				$this->notify();
