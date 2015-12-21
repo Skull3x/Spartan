@@ -752,13 +752,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$pk = new PlayStatusPacket();
 		$pk->status = PlayStatusPacket::PLAYER_SPAWN;
 		$this->dataPacket($pk);
-                
-                $pk = new UpdateAttributesPacket();
-                $pk->minValue = 0;
-                $pk->maxValue = 20;
-                $pk->value = 16;
-                $pk->name = UpdateAttributesPacket::HUNGER;
-                $this->dataPacket($pk);
 
 		$this->server->getPluginManager()->callEvent($ev = new PlayerJoinEvent($this,
 			new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.joined", [
@@ -792,6 +785,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			$pk->z = $pos->z;
 			$this->dataPacket($pk);
 		}
+                
+                $this->setHunger(15);
 	}
 
 	protected function orderChunks(){
@@ -1665,13 +1660,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->dataPacket($pk);
                 
                 $this->setHealth(20);
-                
-		$pk = new UpdateAttributesPacket();
-                $pk->minValue = 0;
-                $pk->maxValue = 20;
-                $pk->value = 16;
-                $pk->name = UpdateAttributesPacket::HUNGER;
-                $this->dataPacket($pk);
 
 		$pk = new SetDifficultyPacket();
 		$pk->difficulty = $this->server->getDifficulty();
@@ -2165,12 +2153,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 						$this->setHealth(20);
                                                 
-                                                $pk = new UpdateAttributesPacket();
-                                                $pk->minValue = 0;
-                                                $pk->maxValue = 20;
-                                                $pk->value = 16;
-                                                $pk->name = UpdateAttributesPacket::HUNGER;
-                                                $this->dataPacket($pk);
+                                                $this->setHunger(15);
 
 						$this->removeAllEffects();
 						$this->sendData($this);
@@ -3228,6 +3211,19 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                         $this->dataPacket($pk);
 		}
 	}
+        
+        public function setHunger($amount) {
+                if($amount > 20) $amount = 20;
+                if($amount < 0) $amount = 0;
+                if($this->spawned === true){
+			$pk = new UpdateAttributesPacket();
+                        $pk->minValue = 0;
+                        $pk->maxValue = 20;
+                        $pk->value = $amount;
+                        $pk->name = UpdateAttributesPacket::HUNGER;
+                        $this->dataPacket($pk);
+		}
+        }
 
 	public function attack($damage, EntityDamageEvent $source){
 		if(!$this->isAlive()){
