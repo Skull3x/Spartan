@@ -1374,7 +1374,7 @@ class Server{
 
 		$version = new VersionString($this->getPocketMineVersion());
 
-		$this->logger->info("Loading pocketmine.yml...");
+		$this->logger->info("Loading config files...");
 		if(!file_exists($this->dataPath . "pocketmine.yml")){
 			$content = file_get_contents($this->filePath . "src/pocketmine/resources/pocketmine.yml");
 			if($version->isDev()){
@@ -1383,8 +1383,7 @@ class Server{
 			@file_put_contents($this->dataPath . "pocketmine.yml", $content);
 		}
 		$this->config = new Config($this->dataPath . "pocketmine.yml", Config::YAML, []);
-
-		$this->logger->info("Loading server properties...");
+                
 		$this->properties = new Config($this->dataPath . "server.properties", Config::PROPERTIES, [
 			"motd" => "Minecraft: PE Server",
 			"server-port" => 19132,
@@ -1412,7 +1411,6 @@ class Server{
 
 		$this->forceLanguage = $this->getProperty("settings.force-language", false);
 		$this->baseLang = new BaseLang($this->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE));
-		$this->logger->info($this->getLanguage()->translateString("language.selected", [$this->getLanguage()->getName(), $this->getLanguage()->getLang()]));
 
 		$this->memoryManager = new MemoryManager($this);
 
@@ -1480,23 +1478,15 @@ class Server{
 			@cli_set_process_title($this->getName() . " " . $this->getPocketMineVersion());
 		}
 
-		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.networkStart", [$this->getIp() === "" ? "*" : $this->getIp(), $this->getPort()]));
 		define("BOOTUP_RANDOM", @Utils::getRandomBytes(16));
 		$this->serverID = Utils::getMachineUniqueId($this->getIp() . $this->getPort());
 
-		$this->getLogger()->debug("Server unique id: " . $this->getServerUniqueId());
-		$this->getLogger()->debug("Machine unique id: " . Utils::getMachineUniqueId());
+		$this->getLogger()->server("Server unique id: " . Terminal::$COLOR_GRAY . $this->getServerUniqueId(), Terminal::$COLOR_LIGHT_PURPLE);
+		$this->getLogger()->server("Machine unique id: " . Terminal::$COLOR_GRAY . Utils::getMachineUniqueId(), Terminal::$COLOR_LIGHT_PURPLE);
 
 		$this->network = new Network($this);
 		$this->network->setName($this->getMotd());
 
-
-		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.info", [
-			$this->getName(),
-			($version->isDev() ? TextFormat::YELLOW : "") . $version->get(true) . TextFormat::WHITE,
-			$this->getCodename(),
-			$this->getApiVersion()
-		]));
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.license", [$this->getName()]));
 
 		Timings::init();
@@ -1518,6 +1508,7 @@ class Server{
 		TextWrapper::init();
 		$this->craftingManager = new CraftingManager();
 
+                $this->logger->server("Enabling plugins...", Terminal::$COLOR_AQUA);
 		$this->pluginManager = new PluginManager($this, $this->commandMap);
 		$this->pluginManager->subscribeToPermission(Server::BROADCAST_CHANNEL_ADMINISTRATIVE, $this->consoleSender);
 		$this->pluginManager->setUseTimings($this->getProperty("settings.enable-profiling", false));
@@ -1982,8 +1973,6 @@ class Server{
 			pcntl_signal(SIGHUP, [$this, "handleSignal"]);
 			$this->dispatchSignals = true;
 		}
-
-		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.defaultGameMode", [self::getGamemodeString($this->getGamemode())]));
 
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.startFinished", [round(microtime(true) - \pocketmine\START_TIME, 3)]));
 

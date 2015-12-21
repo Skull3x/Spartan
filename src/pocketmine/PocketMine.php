@@ -457,7 +457,7 @@ namespace pocketmine {
 	}
 
 	if(\Phar::running(true) === ""){
-		$logger->warning("Non-packaged PocketMine-MP installation detected, do not use on production.");
+		$logger->server("Non-packaged Spartan installation detected, do not use on production", Terminal::$COLOR_YELLOW);
 	}
 
 	ThreadManager::init();
