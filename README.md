@@ -10,7 +10,7 @@ Spartan is a fork of PocketMine-MP(http://github.com/PocketMine/PocketMine-MP) t
 ### Warnings
 - Spartan removes mob ticking to improve performance
 - Removes PocketMine's stats and tracking systems
-- Spartan preforms less checks on players
+- Spartan performs less checks on players
 
 ### About Spartan
 Spartan has been designed to boost your servers performance. Spartan achieves this by removing some unnecessary or unstable features that the normal version of PocketMine has to offer, in most cases you won't even notice their gone. Spartan has also been designed to be the base of the CrazedCraft Network's server software, hence it has been designed to improve performance on larger servers.
