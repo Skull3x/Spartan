@@ -1819,7 +1819,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				}
 
 				if($this->teleportPosition !== null or ($this->forceMovement instanceof Vector3 and (($dist = $newPos->distanceSquared($this->forceMovement)) > 0.1 or $revert))){
-					$this->sendPosition($this->forceMovement, $packet->yaw, $packet->pitch);
+					$this->sendPosition($this->teleportPosition === null ? $this->forceMovement : $this->teleportPosition, $packet->yaw, $packet->pitch);
 				}else{
 					$packet->yaw %= 360;
 					$packet->pitch %= 360;
@@ -2851,7 +2851,11 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->server->getPluginManager()->callEvent($ev = new PlayerKickEvent($this, $reason, $this->getLeaveMessage()));
 		if(!$ev->isCancelled()){
 			if($isAdmin){
-				$message = "Kicked by admin." . ($reason !== "" ? " Reason: " . $reason : "");
+				if(!$this->isBanned()) {
+                                        $message = "Kicked by admin." . ($reason !== "" ? " Reason: " . $reason : "");
+                                } else {
+                                        $message = $reason;
+                                }
 			}else{
 				if($reason === ""){
 					$message = "disconnectionScreen.noReason";
@@ -3333,9 +3337,16 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		return true;
 	}
 
+        /**
+  	 * @param Vector3|Position|Location $pos
+  	 * @param float $yaw
+  	 * @param float $pitch
+  	 *
+  	 * @return bool
+        */
 	public function teleport(Vector3 $pos, $yaw = null, $pitch = null){
 		if(!$this->isOnline()){
-			return;
+			return false;
 		}
 
 		$oldPos = $this->getPosition();
@@ -3360,7 +3371,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			$this->resetFallDistance();
 			$this->nextChunkOrderRun = 0;
 			$this->newPosition = null;
+                        return true;
 		}
+                return false;
 	}
 
 	/**
