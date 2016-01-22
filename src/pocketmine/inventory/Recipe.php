@@ -29,11 +29,20 @@ interface Recipe{
 	 * @return \pocketmine\item\Item
 	 */
 	public function getResult();
-
-	public function registerToCraftingManager();
-
-	/**
-	 * @return UUID
+        
+        /**
+	 * @return \pocketmine\utils\UUID
 	 */
-	public function getId();
+        public function getId();
+        
+        public function setId(UUID $id);
+        
+        /**
+	 * @return array
+	 */
+        public function getIngredientList();
+        
+        public function getIngredientCount();
+
+	public function register();
 }

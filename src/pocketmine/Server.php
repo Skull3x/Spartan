@@ -2159,19 +2159,19 @@ class Server{
 
 	public function sendRecipeList(Player $p){
 		$pk = new CraftingDataPacket();
-		$pk->cleanRecipes = true;
-
-		foreach($this->getCraftingManager()->getRecipes() as $recipe){
-			if($recipe instanceof ShapedRecipe){
-				$pk->addShapedRecipe($recipe);
-			}elseif($recipe instanceof ShapelessRecipe){
-				$pk->addShapelessRecipe($recipe);
-			}
-		}
-
-		foreach($this->getCraftingManager()->getFurnaceRecipes() as $recipe){
-			$pk->addFurnaceRecipe($recipe);
-		}
+//		$pk->cleanRecipes = true;
+//
+//		foreach($this->getCraftingManager()->getRecipes() as $recipe){
+//			if($recipe instanceof ShapedRecipe){
+//				$pk->addShapedRecipe($recipe);
+//			}elseif($recipe instanceof ShapelessRecipe){
+//				$pk->addShapelessRecipe($recipe);
+//			}
+//		}
+//
+//		foreach($this->getCraftingManager()->getFurnaceRecipes() as $recipe){
+//			$pk->addFurnaceRecipe($recipe);
+//		}
 
 		$p->dataPacket($pk);
 	}
