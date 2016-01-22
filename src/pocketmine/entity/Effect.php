@@ -53,7 +53,7 @@ class Effect{
 	const POISON = 19;
 	const WITHER = 20;
 	const HEALTH_BOOST = 21;
-	//const ABSORPTION = 22;
+	const ABSORPTION = 22;
 	//const SATURATION = 23;
 
 	/** @var Effect[] */
@@ -81,7 +81,7 @@ class Effect{
 		self::$effects[Effect::POISON] = new Effect(Effect::POISON, "%potion.poison", 78, 147, 49, true);
 		self::$effects[Effect::WITHER] = new Effect(Effect::WITHER, "%potion.wither", 53, 42, 39, true);
 		self::$effects[Effect::HEALTH_BOOST] = new Effect(Effect::HEALTH_BOOST, "%potion.healthBoost", 248, 125, 35);
-		//Absorption
+		self::$effects[Effect::ABSORPTION] = new Effect(EffecT::ABSORPTION, "%potion.absorption", 38, 83, 166);
 		//Saturation
 	}
 

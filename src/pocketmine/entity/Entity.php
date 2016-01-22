@@ -371,7 +371,9 @@ abstract class Entity extends Location implements Metadatable{
 
 		if($effect->getId() === Effect::HEALTH_BOOST){
 			$this->setHealth($this->getHealth() + 4 * ($effect->getAmplifier() + 1));
-		}
+		} elseif($effect->getId() === Effect::ABSORPTION) {
+                        $this->setHealth($this->getHealth() + (4 * ($effect->getAmplifier() + 1)));
+                }
 	}
 
 	protected function recalculateEffectColor(){
@@ -645,10 +647,10 @@ abstract class Entity extends Location implements Metadatable{
 	 */
 	public function setHealth($amount){
 		$amount = (int) $amount;
-		if($amount === $this->health){
-			return;
-		}
-
+                if($amount === $this->health){
+                        return;
+                }
+                
 		if($amount <= 0){
 			if($this->isAlive()){
 				$this->kill();
@@ -678,7 +680,13 @@ abstract class Entity extends Location implements Metadatable{
 	 * @return int
 	 */
 	public function getMaxHealth(){
-		return $this->maxHealth + ($this->hasEffect(Effect::HEALTH_BOOST) ? 4 * ($this->getEffect(Effect::HEALTH_BOOST)->getAmplifier() + 1) : 0);
+                $extra = 0;
+                if($this->hasEffect(Effect::HEALTH_BOOST)) {
+                        $extra += 4 * ($this->getEffect(Effect::HEALTH_BOOST)->getAmplifier() + 1);
+                } elseif($this->hasEffect(Effect::ABSORPTION)) {
+                        $extra += 4 * ($this->getEffect(Effect::ABSORPTION)->getAmplifier() + 1);
+                }
+		return $this->maxHealth + $extra;
 	}
 
 	/**

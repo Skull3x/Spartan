@@ -1878,7 +1878,7 @@ class Server{
 	 */
 	public function shutdown(){
 		if($this->isRunning){
-			$killer = new ServerKiller(90);
+			$killer = new ServerKiller(10);
 			$killer->start();
 			$killer->detach();
 		}
@@ -1897,18 +1897,23 @@ class Server{
 			if($this->rcon instanceof RCON){
 				$this->rcon->stop();
 			}
+                        
+                        foreach($this->players as $player){
+				$player->close($player->getLeaveMessage(), $this->getProperty("settings.shutdown-message", "Server closed"));
+			}
 
 			if($this->getProperty("network.upnp-forwarding", false) === true){
 				$this->logger->info("[UPnP] Removing port forward...");
 				UPnP::RemovePortForward($this->getPort());
 			}
+                        
+                        $this->getLogger()->debug("Unloading levels");
+			foreach($this->getLevels() as $level){
+				$this->unloadLevel($level, true);
+			}
 
 			$this->getLogger()->debug("Disabling plugins");
 			$this->pluginManager->disablePlugins();
-
-			foreach($this->players as $player){
-				$player->close($player->getLeaveMessage(), $this->getProperty("settings.shutdown-message", "Server closed"));
-			}
 
 			$this->getLogger()->debug("Unloading levels");
 			foreach($this->getLevels() as $level){
@@ -1919,11 +1924,9 @@ class Server{
 			HandlerList::unregisterAll();
 
 			$this->getLogger()->debug("Saving properties");
-			$this->properties->save();
 
 			$this->console->kill();
 
-			$this->getLogger()->debug("Stopping interfaces");
 			foreach($this->network->getInterfaces() as $interface){
 				$interface->shutdown();
 				$this->network->unregisterInterface($interface);
