@@ -1129,7 +1129,7 @@ class Item{
 		}
 	}
 
-	public function __construct(int $id, $meta = 0, $count = 1, $name = "Unknown"){
+	public function __construct($id, $meta = 0, $count = 1, $name = "Unknown"){
 		$this->id = $id & 0xffff;
 		$this->meta = $meta !== null ? $meta & 0xffff : null;
 		$this->count = (int) $count;
