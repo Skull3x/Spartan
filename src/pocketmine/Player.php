@@ -1510,7 +1510,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
         }
 
         public function inRange(Vector3 $pos) {
-                return $this->distance($pos) < 4.5;
+                return round($this->distance($pos), 5) < 4.5;
         }
 
         public function onPlayerPreLogin() {
