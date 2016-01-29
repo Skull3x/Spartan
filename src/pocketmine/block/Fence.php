@@ -26,13 +26,14 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 
 class Fence extends Transparent{
+	
 	const FENCE_OAK = 0;  
 	const FENCE_SPRUCE = 1;
 	const FENCE_BIRCH = 2;
 	const FENCE_JUNGLE = 3;
 	const FENCE_ACACIA = 4;
 	const FENCE_DARKOAK = 5;
-    
+
 	protected $id = self::FENCE;
 
 	public function __construct($meta = 0){
@@ -50,12 +51,12 @@ class Fence extends Transparent{
 
 	public function getName(){
 		static $names = [
-			self::FENCE_OAK => "Oak Fence",
-			self::FENCE_SPRUCE => "Spruce Fence",
-			self::FENCE_BIRCH => "Birch Fence",
-			self::FENCE_JUNGLE => "Jungle Fence",
-			self::FENCE_ACACIA => "Acacia Fence",
-			self::FENCE_DARKOAK => "Dark Oak Fence",
+			0 => "Oak Fence",
+			1 => "Spruce Fence",
+			2 => "Birch Fence",
+			3 => "Jungle Fence",
+			4 => "Acacia Fence",
+			5 => "Dark Oak Fence",
 			"",
 			""
 		];

@@ -24,8 +24,8 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\level\sound\DoorSound;
 use pocketmine\Player;
+use pocketmine\level\sound\DoorSound;
 
 class Trapdoor extends Transparent{
 
@@ -116,6 +116,10 @@ class Trapdoor extends Transparent{
 		}
 
 		return $bb;
+	}
+
+	public function isOpened(){
+		return ($this->getDamage() & 0x04) > 0;
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){

@@ -135,7 +135,7 @@ class BurningFurnace extends Solid{
 
 	public function getDrops(Item $item){
 		$drops = [];
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+		if($item->isPickaxe() >= 1){
 			$drops[] = [Item::FURNACE, 0, 1];
 		}
 

@@ -37,6 +37,7 @@ class Stone extends Solid{
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
+
 	}
 
 	public function getHardness(){

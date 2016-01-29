@@ -84,6 +84,7 @@ class EnchantingTable extends Transparent{
 	}
 
 	public function onActivate(Item $item, Player $player = null){
+		if(!$this->getLevel()->getServer()->anviletEnabled) return true;
 		if($player instanceof Player){
 			//TODO lock
 			if($player->isCreative()){
@@ -97,7 +98,7 @@ class EnchantingTable extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+		if($item->isPickaxe() >= 1){
 			return [
 				[$this->id, 0, 1],
 			];

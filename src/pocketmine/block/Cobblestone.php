@@ -45,7 +45,7 @@ class Cobblestone extends Solid{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+		if($item->isPickaxe() >= 1){
 			return [
 				[Item::COBBLESTONE, 0, 1],
 			];

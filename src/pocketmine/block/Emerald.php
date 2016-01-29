@@ -45,7 +45,7 @@ class Emerald extends Solid{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_IRON){
+		if($item->isPickaxe() >= 4){
 			return [
 				[Item::EMERALD_BLOCK, 0, 1],
 			];

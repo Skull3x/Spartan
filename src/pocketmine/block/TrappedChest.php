@@ -1,23 +1,10 @@
 <?php
-
-/*
- *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
- * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author PocketMine Team
- * @link http://www.pocketmine.net/
- * 
- *
-*/
+/**
+ * Author: PeratX
+ * Time: 2015/12/13 19:18
+ * Copyright(C) 2011-2015 iTX Technologies LLC.
+ * All rights reserved.
+ */
 
 namespace pocketmine\block;
 
@@ -33,12 +20,26 @@ use pocketmine\Player;
 use pocketmine\tile\Chest as TileChest;
 use pocketmine\tile\Tile;
 
-class TrappedChest extends Transparent{
-
-	protected $id = self::CHEST;
+class TrappedChest extends RedstoneSource{
+	protected $id = self::TRAPPED_CHEST;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
+	}
+
+	public function getBoundingBox(){
+		if($this->boundingBox === null){
+			$this->boundingBox = $this->recalculateBoundingBox();
+		}
+		return $this->boundingBox;
+	}
+
+	public function isSolid(){
+		return true;
+	}
+
+	public function canBeFlowedInto(){
+		return false;
 	}
 
 	public function canBeActivated(){
@@ -47,6 +48,10 @@ class TrappedChest extends Transparent{
 
 	public function getHardness(){
 		return 2.5;
+	}
+
+	public function getResistance(){
+		return $this->getHardness() * 5;
 	}
 
 	public function getName(){
@@ -59,21 +64,21 @@ class TrappedChest extends Transparent{
 
 	protected function recalculateBoundingBox(){
 		return new AxisAlignedBB(
-			$this->x + 0.0625,
-			$this->y,
-			$this->z + 0.0625,
-			$this->x + 0.9375,
-			$this->y + 0.9475,
-			$this->z + 0.9375
+				$this->x + 0.0625,
+				$this->y,
+				$this->z + 0.0625,
+				$this->x + 0.9375,
+				$this->y + 0.9475,
+				$this->z + 0.9375
 		);
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$faces = [
-			0 => 4,
-			1 => 2,
-			2 => 5,
-			3 => 3,
+				0 => 4,
+				1 => 2,
+				2 => 5,
+				3 => 3,
 		];
 
 		$chest = null;
@@ -97,11 +102,11 @@ class TrappedChest extends Transparent{
 
 		$this->getLevel()->setBlock($block, $this, true, true);
 		$nbt = new Compound("", [
-			new Enum("Items", []),
-			new String("id", Tile::CHEST),
-			new Int("x", $this->x),
-			new Int("y", $this->y),
-			new Int("z", $this->z)
+				new Enum("Items", []),
+				new String("id", Tile::CHEST),
+				new Int("x", $this->x),
+				new Int("y", $this->y),
+				new Int("z", $this->z)
 		]);
 		$nbt->Items->setTagType(NBT::TAG_Compound);
 
@@ -148,11 +153,11 @@ class TrappedChest extends Transparent{
 				$chest = $t;
 			}else{
 				$nbt = new Compound("", [
-					new Enum("Items", []),
-					new String("id", Tile::CHEST),
-					new Int("x", $this->x),
-					new Int("y", $this->y),
-					new Int("z", $this->z)
+						new Enum("Items", []),
+						new String("id", Tile::CHEST),
+						new Int("x", $this->x),
+						new Int("y", $this->y),
+						new Int("z", $this->z)
 				]);
 				$nbt->Items->setTagType(NBT::TAG_Compound);
 				$chest = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
@@ -175,7 +180,7 @@ class TrappedChest extends Transparent{
 
 	public function getDrops(Item $item){
 		return [
-			[$this->id, 0, 1],
+				[$this->id, 0, 1],
 		];
 	}
 }

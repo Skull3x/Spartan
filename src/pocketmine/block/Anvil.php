@@ -59,6 +59,7 @@ class Anvil extends Fallable{
 	}
 
 	public function onActivate(Item $item, Player $player = null){
+		if(!$this->getLevel()->getServer()->anviletEnabled) return true;
 		if($player instanceof Player){
 			if($player->isCreative()){
 				return true;
@@ -71,7 +72,7 @@ class Anvil extends Fallable{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+		if($item->isPickaxe() >= 1){
 			return [
 				[$this->id, 0, 1], //TODO break level
 			];

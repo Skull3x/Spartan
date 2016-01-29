@@ -29,7 +29,7 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 
-abstract class Door extends Transparent{
+abstract class Door extends Transparent implements ElectricalAppliance{
 
 	public function canBeActivated(){
 		return true;
@@ -37,6 +37,10 @@ abstract class Door extends Transparent{
 
 	public function isSolid(){
 		return false;
+	}
+
+	public function canPassThrough(){
+		return true;
 	}
 
 	private function getFullDamage(){
@@ -263,6 +267,10 @@ abstract class Door extends Transparent{
 		$this->getLevel()->setBlock($this, new Air(), true);
 
 		return true;
+	}
+
+	public function isOpened(){
+		return (($this->getFullDamage() & 0x04) > 0);
 	}
 
 	public function onActivate(Item $item, Player $player = null){

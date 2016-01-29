@@ -75,8 +75,9 @@ class Block extends Position implements Metadatable{
 
 	const SANDSTONE = 24;
 
-	const BED_BLOCK = 26;
+	const NOTEBLOCK = 25;
 
+	const BED_BLOCK = 26;
 
 	const COBWEB = 30;
 	const TALL_GRASS = 31;
@@ -111,6 +112,7 @@ class Block extends Position implements Metadatable{
 	const OAK_WOODEN_STAIRS = 53;
 	const CHEST = 54;
 
+	const REDSTONE_WIRE = 55;
 	const DIAMOND_ORE = 56;
 	const DIAMOND_BLOCK = 57;
 	const CRAFTING_TABLE = 58;
@@ -132,10 +134,16 @@ class Block extends Position implements Metadatable{
 
 	const IRON_DOOR_BLOCK = 71;
 
+	const LEVER = 69;
+	const STONE_PRESSURE_PLATE = 70;
+	const WOODEN_PRESSURE_PLATE = 72;
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
 
+	const UNLIT_REDSTONE_TORCH = 75;
+	const REDSTONE_TORCH = 76;
+	const STONE_BUTTON = 77;
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
 	const ICE = 79;
@@ -152,7 +160,7 @@ class Block extends Position implements Metadatable{
 	const GLOWSTONE = 89;
 	const GLOWSTONE_BLOCK = 89;
 
-
+	const PORTAL = 90;
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
 	const CAKE_BLOCK = 92;
@@ -181,15 +189,19 @@ class Block extends Position implements Metadatable{
 	const LILY_PAD = 111;
 	const NETHER_BRICKS = 112;
 	const NETHER_BRICK_BLOCK = 112;
-	const NETHER_BRICK_FENCE = 113;
+
 	const NETHER_BRICKS_STAIRS = 114;
 
 	const ENCHANTING_TABLE = 116;
 	const ENCHANT_TABLE = 116;
 	const ENCHANTMENT_TABLE = 116;
+
 	const BREWING_STAND = 117;
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
+
+	const INACTIVE_REDSTONE_LAMP = 123;
+	const ACTIVE_REDSTONE_LAMP = 124;
 
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
@@ -205,15 +217,25 @@ class Block extends Position implements Metadatable{
 	const COBBLE_WALL = 139;
 	const STONE_WALL = 139;
 	const COBBLESTONE_WALL = 139;
+
 	const FLOWER_POT_BLOCK = 140;
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const WOODEN_BUTTON = 143;
+
+	const SKULL_BLOCK = 144;
+
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
 
+	const LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
+	const HEAVY_WEIGHTED_PRESSURE_PLATE = 148;
+	const DAYLIGHT_SENSOR = 151;
+	const DAYLIGHT_SENSOR_INVERTED = 178;
 	const REDSTONE_BLOCK = 152;
 
+	const NETHER_QUARTZ_ORE = 153;
 	const QUARTZ_BLOCK = 155;
 	const QUARTZ_STAIRS = 156;
 	const DOUBLE_WOOD_SLAB = 157;
@@ -242,6 +264,7 @@ class Block extends Position implements Metadatable{
 	const CARPET = 171;
 	const HARDENED_CLAY = 172;
 	const COAL_BLOCK = 173;
+
 	const PACKED_ICE = 174;
 	const DOUBLE_PLANT = 175;
 
@@ -251,12 +274,24 @@ class Block extends Position implements Metadatable{
 	const FENCE_GATE_DARK_OAK = 186;
 	const FENCE_GATE_ACACIA = 187;
 
+	const SPRUCE_DOOR_BLOCK = 193;
+	const BIRCH_DOOR_BLOCK = 194;
+	const JUNGLE_DOOR_BLOCK = 195;
+	const ACACIA_DOOR_BLOCK = 196;
+	const DARK_OAK_DOOR_BLOCK = 197;
+
 	const GRASS_PATH = 198;
 
 	const PODZOL = 243;
 	const BEETROOT_BLOCK = 244;
 	const STONECUTTER = 245;
 	const GLOWING_OBSIDIAN = 246;
+	const NETHER_REACTOR = 247;
+	
+	const NETHER_BRICK_FENCE = 113;
+	
+	const RAIL = 66;
+	const POWERED_RAIL = 27;
 
 	/** @var \SplFixedArray */
 	public static $list = null;
@@ -372,6 +407,11 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BURNING_FURNACE] = BurningFurnace::class;
 			self::$list[self::SIGN_POST] = SignPost::class;
 			self::$list[self::WOOD_DOOR_BLOCK] = WoodDoor::class;
+			self::$list[self::SPRUCE_DOOR_BLOCK] = SpruceDoor::class;
+			self::$list[self::BIRCH_DOOR_BLOCK] = BirchDoor::class;
+			self::$list[self::JUNGLE_DOOR_BLOCK] = JungleDoor::class;
+			self::$list[self::ACACIA_DOOR_BLOCK] = AcaciaDoor::class;
+			self::$list[self::DARK_OAK_DOOR_BLOCK] = DarkOakDoor::class;
 			self::$list[self::LADDER] = Ladder::class;
 
 			self::$list[self::COBBLESTONE_STAIRS] = CobblestoneStairs::class;
@@ -414,10 +454,12 @@ class Block extends Position implements Metadatable{
 			self::$list[self::MYCELIUM] = Mycelium::class;
 			self::$list[self::WATER_LILY] = WaterLily::class;
 			self::$list[self::NETHER_BRICKS] = NetherBrick::class;
-			self::$list[self::NETHER_BRICK_FENCE] = NetherBrickFence::class;
+
+			self::$list[self::PORTAL] = Portal::class;
 			self::$list[self::NETHER_BRICKS_STAIRS] = NetherBrickStairs::class;
 
 			self::$list[self::ENCHANTING_TABLE] = EnchantingTable::class;
+
 			self::$list[self::BREWING_STAND] = BrewingStand::class;
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
@@ -429,10 +471,12 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BIRCH_WOOD_STAIRS] = BirchWoodStairs::class;
 			self::$list[self::JUNGLE_WOOD_STAIRS] = JungleWoodStairs::class;
 			self::$list[self::STONE_WALL] = StoneWall::class;
+
 			self::$list[self::FLOWER_POT_BLOCK] = FlowerPot::class;
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
 			self::$list[self::ANVIL] = Anvil::class;
+
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
 			self::$list[self::REDSTONE_BLOCK] = Redstone::class;
 
@@ -447,11 +491,11 @@ class Block extends Position implements Metadatable{
 			self::$list[self::ACACIA_WOOD_STAIRS] = AcaciaWoodStairs::class;
 			self::$list[self::DARK_OAK_WOOD_STAIRS] = DarkOakWoodStairs::class;
 
-			self::$list[self::IRON_TRAPDOOR] = IronTrapdoor::class;
 			self::$list[self::HAY_BALE] = HayBale::class;
 			self::$list[self::CARPET] = Carpet::class;
 			self::$list[self::HARDENED_CLAY] = HardenedClay::class;
 			self::$list[self::COAL_BLOCK] = Coal::class;
+
 			self::$list[self::PACKED_ICE] = PackedIce::class;
 			self::$list[self::DOUBLE_PLANT] = DoublePlant::class;
 
@@ -467,6 +511,29 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BEETROOT_BLOCK] = Beetroot::class;
 			self::$list[self::STONECUTTER] = Stonecutter::class;
 			self::$list[self::GLOWING_OBSIDIAN] = GlowingObsidian::class;
+			self::$list[self::NETHER_REACTOR] = NetherReactor::class;
+			
+			self::$list[self::NETHER_BRICK_FENCE] = NetherBrickFence::class;
+			self::$list[self::POWERED_RAIL] = PoweredRail::class;
+			self::$list[self::RAIL] = Rail::class;
+
+			self::$list[self::WOODEN_PRESSURE_PLATE] = WoodenPressurePlate::class;
+			self::$list[self::STONE_PRESSURE_PLATE] = StonePressurePlate::class;
+			self::$list[self::LIGHT_WEIGHTED_PRESSURE_PLATE] = LightWeightedPressurePlate::class;
+			self::$list[self::HEAVY_WEIGHTED_PRESSURE_PLATE] = HeavyWeightedPressurePlate::class;
+			self::$list[self::REDSTONE_WIRE] = RedstoneWire::class;
+			self::$list[self::ACTIVE_REDSTONE_LAMP] = ActiveRedstoneLamp::class;
+			self::$list[self::INACTIVE_REDSTONE_LAMP] = InactiveRedstoneLamp::class;
+			self::$list[self::REDSTONE_TORCH] = RedstoneTorch::class;
+			self::$list[self::UNLIT_REDSTONE_TORCH] = UnlitRedstoneTorch::class;
+			self::$list[self::WOODEN_BUTTON] = WoodenButton::class;
+			self::$list[self::STONE_BUTTON] = StoneButton::class;
+			self::$list[self::LEVER] = Lever::class;
+			self::$list[self::DAYLIGHT_SENSOR] = DaylightDetector::class;
+			self::$list[self::DAYLIGHT_SENSOR_INVERTED] = DaylightDetectorInverted::class;
+			self::$list[self::NOTEBLOCK] = Noteblock::class;
+			self::$list[self::SKULL_BLOCK] = SkullBlock::class;
+			self::$list[self::NETHER_QUARTZ_ORE] = NetherQuartzOre::class;
 
 			foreach(self::$list as $id => $class){
 				if($class !== null){
@@ -648,6 +715,10 @@ class Block extends Position implements Metadatable{
 	 */
 	public function canBePlaced(){
 		return true;
+	}
+	
+	public function isPlaceable(){
+		return $this->canBePlaced();
 	}
 
 	/**
