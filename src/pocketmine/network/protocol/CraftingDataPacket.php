@@ -75,7 +75,12 @@ class CraftingDataPacket extends DataPacket{
 	private static function writeShapedRecipe(ShapedRecipe $recipe, BinaryStream $stream){
 		$stream->putInt($recipe->getWidth());
 		$stream->putInt($recipe->getHeight());
-		$stream->putSlot($recipe->getWidth() * $recipe->getHeight());
+
+		for($z = 0; $z < $recipe->getWidth(); ++$z){
+			for($x = 0; $x < $recipe->getHeight(); ++$x){
+				$stream->putSlot($recipe->getIngredient($x, $z));
+			}
+		}
 
 		$stream->putInt(1);
 		$stream->putSlot($recipe->getResult());
