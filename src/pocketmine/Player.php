@@ -1504,10 +1504,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                 return ($dot1 - $dot) >= -$maxDiff;
         }
 
-        public function inRange(Vector3 $pos) {
-                return true;
-        }
-
         public function onPlayerPreLogin() {
                 $this->tryAuthenticate();
         }
@@ -1962,10 +1958,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                                 $blockVector = new Vector3($packet->x, $packet->y, $packet->z);
 
-                                if(!$this->inRange($blockVector)) {
-                                        $this->kick("Please disable reach hacks to play.", false);
-                                }
-
                                 $this->craftingType = 0;
 
                                 if($packet->face >= 0 and $packet->face <= 5) { //Use Block, place
@@ -2036,8 +2028,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 //                                                        new Double("", $aimPos->y),
 //                                                        new Double("", $aimPos->z)
                                                         new Double("", -sin($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI)),
-                                                        + new Double("", -sin($this->pitch / 180 * M_PI)),
-                                                        + new Double("", cos($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI))
+                                                        new Double("", -sin($this->pitch / 180 * M_PI)),
+                                                        new Double("", cos($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI))
                                                             ]),
                                                     "Rotation" => new Enum("Rotation", [
                                                         new Float("", $this->yaw),
@@ -2076,10 +2068,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                                 $packet->eid = $this->id;
                                 $pos = new Vector3($packet->x, $packet->y, $packet->z);
-
-                                if(!$this->inRange($pos)) {
-                                        $this->kick("Please disable reach hacks to play.", false);
-                                }
 
                                 switch ($packet->action) {
                                         case PlayerActionPacket::ACTION_START_BREAK:
@@ -2325,10 +2313,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 $this->craftingType = 0;
 
                                 $target = $this->level->getEntity($packet->target);
-
-                                if(!$this->inRange($target)) {
-                                        $this->kick("Please disable reach hacks to play.", false);
-                                }
 
                                 $cancelled = false;
 
