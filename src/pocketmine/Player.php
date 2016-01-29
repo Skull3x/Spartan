@@ -2032,9 +2032,12 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                                         new Double("", $this->z)
                                                             ]),
                                                     "Motion" => new Enum("Motion", [
-                                                        new Double("", $aimPos->x),
-                                                        new Double("", $aimPos->y),
-                                                        new Double("", $aimPos->z)
+//                                                        new Double("", $aimPos->x),
+//                                                        new Double("", $aimPos->y),
+//                                                        new Double("", $aimPos->z)
+                                                        new Double("", -sin($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI)),
+                                                        + new Double("", -sin($this->pitch / 180 * M_PI)),
+                                                        + new Double("", cos($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI))
                                                             ]),
                                                     "Rotation" => new Enum("Rotation", [
                                                         new Float("", $this->yaw),
@@ -2535,173 +2538,172 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 break;
 
                         case ProtocolInfo::CONTAINER_CLOSE_PACKET:
-				if($this->spawned === false or $packet->windowid === 0){
-					break;
-				}
-				$this->craftingType = 0;
-				$this->currentTransaction = null;
-				if(isset($this->windowIndex[$packet->windowid])){
-					$this->server->getPluginManager()->callEvent(new InventoryCloseEvent($this->windowIndex[$packet->windowid], $this));
-					$this->removeWindow($this->windowIndex[$packet->windowid]);
-				}else{
-					unset($this->windowIndex[$packet->windowid]);
-				}
-				break;
+                                if($this->spawned === false or $packet->windowid === 0) {
+                                        break;
+                                }
+                                $this->craftingType = 0;
+                                $this->currentTransaction = null;
+                                if(isset($this->windowIndex[$packet->windowid])) {
+                                        $this->server->getPluginManager()->callEvent(new InventoryCloseEvent($this->windowIndex[$packet->windowid], $this));
+                                        $this->removeWindow($this->windowIndex[$packet->windowid]);
+                                } else {
+                                        unset($this->windowIndex[$packet->windowid]);
+                                }
+                                break;
 
-			case ProtocolInfo::CRAFTING_EVENT_PACKET:
-				if($this->spawned === false or !$this->isAlive()){
-					break;
-				}elseif(!isset($this->windowIndex[$packet->windowId])){
-					$this->inventory->sendContents($this);
-					$pk = new ContainerClosePacket();
-					$pk->windowid = $packet->windowId;
-					$this->dataPacket($pk);
-					break;
-				}
+                        case ProtocolInfo::CRAFTING_EVENT_PACKET:
+                                if($this->spawned === false or ! $this->isAlive()) {
+                                        break;
+                                } elseif(!isset($this->windowIndex[$packet->windowId])) {
+                                        $this->inventory->sendContents($this);
+                                        $pk = new ContainerClosePacket();
+                                        $pk->windowid = $packet->windowId;
+                                        $this->dataPacket($pk);
+                                        break;
+                                }
 
-				$recipe = $this->server->getCraftingManager()->getRecipe($packet->id);
-
-
-				if($recipe === null or (($recipe instanceof BigShapelessRecipe or $recipe instanceof BigShapedRecipe) and $this->craftingType === 0)){
-					$this->inventory->sendContents($this);
-					break;
-				}
-
-				/** @var Item $item */
-				foreach($packet->input as $i => $item){
-					if($item->getDamage() === -1 or $item->getDamage() === 0xffff){
-						$item->setDamage(null);
-					}
-
-					if($i < 9 and $item->getId() > 0){
-						$item->setCount(1);
-					}
-				}
-
-				$canCraft = true;
+                                $recipe = $this->server->getCraftingManager()->getRecipe($packet->id);
 
 
-				if($recipe instanceof ShapedRecipe){
-					for($x = 0; $x < 3 and $canCraft; ++$x){
-						for($y = 0; $y < 3; ++$y){
-							$item = $packet->input[$y * 3 + $x];
-							$ingredient = $recipe->getIngredient($x, $y);
-							if($item->getCount() > 0 and $item->getId() > 0){
-								if($ingredient == null){
-									$canCraft = false;
-									break;
-								}
-								if($ingredient->getId() != 0 and !$ingredient->deepEquals($item, $ingredient->getDamage() !== null, $ingredient->getCompoundTag() !== null)){
-									$canCraft = false;
-									break;
-								}
+                                if($recipe === null or ( ($recipe instanceof BigShapelessRecipe or $recipe instanceof BigShapedRecipe) and $this->craftingType === 0)) {
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
 
-							}elseif($ingredient !== null and $item->getId() !== 0){
-								$canCraft = false;
-								break;
-							}
-						}
-					}
-				}elseif($recipe instanceof ShapelessRecipe){
-					$needed = $recipe->getIngredientList();
+                                /** @var Item $item */
+                                foreach($packet->input as $i => $item) {
+                                        if($item->getDamage() === -1 or $item->getDamage() === 0xffff) {
+                                                $item->setDamage(null);
+                                        }
 
-					for($x = 0; $x < 3 and $canCraft; ++$x){
-						for($y = 0; $y < 3; ++$y){
-							$item = clone $packet->input[$y * 3 + $x];
+                                        if($i < 9 and $item->getId() > 0) {
+                                                $item->setCount(1);
+                                        }
+                                }
 
-							foreach($needed as $k => $n){
-								if($n->deepEquals($item, $n->getDamage() !== null, $n->getCompoundTag() !== null)){
-									$remove = min($n->getCount(), $item->getCount());
-									$n->setCount($n->getCount() - $remove);
-									$item->setCount($item->getCount() - $remove);
+                                $canCraft = true;
 
-									if($n->getCount() === 0){
-										unset($needed[$k]);
-									}
-								}
-							}
 
-							if($item->getCount() > 0){
-								$canCraft = false;
-								break;
-							}
-						}
-					}
+                                if($recipe instanceof ShapedRecipe) {
+                                        for($x = 0; $x < 3 and $canCraft; ++$x) {
+                                                for($y = 0; $y < 3; ++$y) {
+                                                        $item = $packet->input[$y * 3 + $x];
+                                                        $ingredient = $recipe->getIngredient($x, $y);
+                                                        if($item->getCount() > 0 and $item->getId() > 0) {
+                                                                if($ingredient == null) {
+                                                                        $canCraft = false;
+                                                                        break;
+                                                                }
+                                                                if($ingredient->getId() != 0 and ! $ingredient->deepEquals($item, $ingredient->getDamage() !== null, $ingredient->getCompoundTag() !== null)) {
+                                                                        $canCraft = false;
+                                                                        break;
+                                                                }
+                                                        } elseif($ingredient !== null and $item->getId() !== 0) {
+                                                                $canCraft = false;
+                                                                break;
+                                                        }
+                                                }
+                                        }
+                                } elseif($recipe instanceof ShapelessRecipe) {
+                                        $needed = $recipe->getIngredientList();
 
-					if(count($needed) > 0){
-						$canCraft = false;
-					}
-				}else{
-					$canCraft = false;
-				}
+                                        for($x = 0; $x < 3 and $canCraft; ++$x) {
+                                                for($y = 0; $y < 3; ++$y) {
+                                                        $item = clone $packet->input[$y * 3 + $x];
 
-				/** @var Item[] $ingredients */
-				$canCraft = true;//0.13.1大量物品本地配方出现问题,无法解决,使用极端(唯一)方法修复.
-				$ingredients = $packet->input;
-				$result = $packet->output[0];
+                                                        foreach($needed as $k => $n) {
+                                                                if($n->deepEquals($item, $n->getDamage() !== null, $n->getCompoundTag() !== null)) {
+                                                                        $remove = min($n->getCount(), $item->getCount());
+                                                                        $n->setCount($n->getCount() - $remove);
+                                                                        $item->setCount($item->getCount() - $remove);
 
-				if(!$canCraft or !$recipe->getResult()->deepEquals($result)){
-					$this->server->getLogger()->debug("Unmatched recipe " . $recipe->getId() . " from player " . $this->getName() . ": expected " . $recipe->getResult() . ", got " . $result . ", using: " . implode(", ", $ingredients));
-					$this->inventory->sendContents($this);
-					break;
-				}
+                                                                        if($n->getCount() === 0) {
+                                                                                unset($needed[$k]);
+                                                                        }
+                                                                }
+                                                        }
 
-				$used = array_fill(0, $this->inventory->getSize(), 0);
+                                                        if($item->getCount() > 0) {
+                                                                $canCraft = false;
+                                                                break;
+                                                        }
+                                                }
+                                        }
 
-				foreach($ingredients as $ingredient){
-					$slot = -1;
-					foreach($this->inventory->getContents() as $index => $i){
-						if($ingredient->getId() !== 0 and $ingredient->deepEquals($i, $ingredient->getDamage() !== null) and ($i->getCount() - $used[$index]) >= 1){
-							$slot = $index;
-							$used[$index]++;
-							break;
-						}
-					}
+                                        if(count($needed) > 0) {
+                                                $canCraft = false;
+                                        }
+                                } else {
+                                        $canCraft = false;
+                                }
 
-					if($ingredient->getId() !== 0 and $slot === -1){
-						$canCraft = false;
-						break;
-					}
-				}
+                                /** @var Item[] $ingredients */
+                                $canCraft = true; //0.13.1大量物品本地配方出现问题,无法解决,使用极端(唯一)方法修复.
+                                $ingredients = $packet->input;
+                                $result = $packet->output[0];
 
-				if(!$canCraft){
-					$this->server->getLogger()->debug("Unmatched recipe " . $recipe->getId() . " from player " . $this->getName() . ": client does not have enough items, using: " . implode(", ", $ingredients));
-					$this->inventory->sendContents($this);
-					break;
-				}
+                                if(!$canCraft or ! $recipe->getResult()->deepEquals($result)) {
+                                        $this->server->getLogger()->debug("Unmatched recipe " . $recipe->getId() . " from player " . $this->getName() . ": expected " . $recipe->getResult() . ", got " . $result . ", using: " . implode(", ", $ingredients));
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
 
-				$this->server->getPluginManager()->callEvent($ev = new CraftItemEvent($ingredients, $recipe));
+                                $used = array_fill(0, $this->inventory->getSize(), 0);
 
-				if($ev->isCancelled()){
-					$this->inventory->sendContents($this);
-					break;
-				}
+                                foreach($ingredients as $ingredient) {
+                                        $slot = -1;
+                                        foreach($this->inventory->getContents() as $index => $i) {
+                                                if($ingredient->getId() !== 0 and $ingredient->deepEquals($i, $ingredient->getDamage() !== null) and ( $i->getCount() - $used[$index]) >= 1) {
+                                                        $slot = $index;
+                                                        $used[$index] ++;
+                                                        break;
+                                                }
+                                        }
 
-				foreach($used as $slot => $count){
-					if($count === 0){
-						continue;
-					}
+                                        if($ingredient->getId() !== 0 and $slot === -1) {
+                                                $canCraft = false;
+                                                break;
+                                        }
+                                }
 
-					$item = $this->inventory->getItem($slot);
+                                if(!$canCraft) {
+                                        $this->server->getLogger()->debug("Unmatched recipe " . $recipe->getId() . " from player " . $this->getName() . ": client does not have enough items, using: " . implode(", ", $ingredients));
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
 
-					if($item->getCount() > $count){
-						$newItem = clone $item;
-						$newItem->setCount($item->getCount() - $count);
-					}else{
-						$newItem = Item::get(Item::AIR, 0, 0);
-					}
+                                $this->server->getPluginManager()->callEvent($ev = new CraftItemEvent($this, $ingredients, $recipe));
 
-					$this->inventory->setItem($slot, $newItem);
-				}
+                                if($ev->isCancelled()) {
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
 
-				$extraItem = $this->inventory->addItem($recipe->getResult());
-				if(count($extraItem) > 0){
-					foreach($extraItem as $item){
-						$this->level->dropItem($this, $item);
-					}
-				}
-                                
-				break;
+                                foreach($used as $slot => $count) {
+                                        if($count === 0) {
+                                                continue;
+                                        }
+
+                                        $item = $this->inventory->getItem($slot);
+
+                                        if($item->getCount() > $count) {
+                                                $newItem = clone $item;
+                                                $newItem->setCount($item->getCount() - $count);
+                                        } else {
+                                                $newItem = Item::get(Item::AIR, 0, 0);
+                                        }
+
+                                        $this->inventory->setItem($slot, $newItem);
+                                }
+
+                                $extraItem = $this->inventory->addItem($recipe->getResult());
+                                if(count($extraItem) > 0) {
+                                        foreach($extraItem as $item) {
+                                                $this->level->dropItem($this, $item);
+                                        }
+                                }
+
+                                break;
 
                         case ProtocolInfo::CONTAINER_SET_SLOT_PACKET:
                                 if($this->spawned === false or $this->blocked === true or ! $this->isAlive()) {
