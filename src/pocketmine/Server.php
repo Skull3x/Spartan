@@ -2158,7 +2158,19 @@ class Server{
 	}
 
 	public function sendRecipeList(Player $p){
-		$p->dataPacket(clone $this->recipeList);
+		$pk = new CraftingDataPacket();
+		$pk->cleanRecipes = true;
+		foreach($this->getCraftingManager()->getRecipes() as $recipe){
+			if($recipe instanceof ShapedRecipe){
+				$pk->addShapedRecipe($recipe);
+			}elseif($recipe instanceof ShapelessRecipe){
+				$pk->addShapelessRecipe($recipe);
+			}
+		}
+		foreach($this->getCraftingManager()->getFurnaceRecipes() as $recipe){
+			$pk->addFurnaceRecipe($recipe);
+		}
+		$p->dataPacket($pk);
 	}
 
 	private function checkTickUpdates($currentTick, $tickTime){

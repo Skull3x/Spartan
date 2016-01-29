@@ -1385,11 +1385,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                 if($this->inAirTicks >= $time) {
                         $this->kick("Please disable flying mods to play.", false);
                 }
-                //Max blocks a player can move per movement
-                $blocks = 5.2;
-                if(round($from->distance($to), 5) > $blocks) {
-                        $this->kick("Please disable speed mods to play.", false);
-                }
         }
 
         public function setMotion(Vector3 $mot) {
