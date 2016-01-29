@@ -228,6 +228,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
         /** @var PermissibleBase */
         private $perm = null;
+        
+        public $lastSnowball = 0;
 
         public function getLeaveMessage() {
                 return new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.left", [
@@ -1997,10 +1999,14 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                         break;
                                 } elseif($packet->face === 0xff) {
                                         $aimPos = (new Vector3($packet->x / 32768, $packet->y / 32768, $packet->z / 32768))->normalize();
-
-                                        if($this->isCreative()) {
-                                                $item = $this->inventory->getItemInHand();
-                                        } elseif(!$this->inventory->getItemInHand()->deepEquals($packet->item)) {
+                                        
+                                        if(($this->ticksLived - $this->lastSnowball) <= 10) {
+                                                $this->inventory->sendHeldItem($this);
+                                                break;
+                                        }
+                                        $this->lastSnowball = $this->ticksLived;
+                                        
+                                        if(!$this->inventory->getItemInHand()->deepEquals($packet->item)) {
                                                 $this->inventory->sendHeldItem($this);
                                                 break;
                                         } else {
@@ -2024,9 +2030,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                                         new Double("", $this->z)
                                                             ]),
                                                     "Motion" => new Enum("Motion", [
-//                                                        new Double("", $aimPos->x),
-//                                                        new Double("", $aimPos->y),
-//                                                        new Double("", $aimPos->z)
+                                                        /*new Double("", $aimPos->x),
+                                                        new Double("", $aimPos->y),
+                                                        new Double("", $aimPos->z)*/
                                                         new Double("", -sin($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI)),
                                                         new Double("", -sin($this->pitch / 180 * M_PI)),
                                                         new Double("", cos($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI))
@@ -2037,7 +2043,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                                             ]),
                                                 ]);
 
-                                                $f = 1.5;
+                                                $f = 0.8;
                                                 $snowball = Entity::createEntity("Snowball", $this->chunk, $nbt, $this);
                                                 $snowball->setMotion($snowball->getMotion()->multiply($f));
                                                 if($this->isSurvival()) {
