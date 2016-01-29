@@ -27,31 +27,32 @@ use pocketmine\Player;
 /**
  * Called when a player leaves the server
  */
-class PlayerKickEvent extends PlayerEvent implements Cancellable{
-	public static $handlerList = null;
+class PlayerKickEvent extends PlayerEvent implements Cancellable {
 
-	/** @var string */
-	protected $quitMessage;
+        public static $handlerList = null;
 
-	/** @var string */
-	protected $reason;
+        /** @var string */
+        protected $quitMessage;
 
-	public function __construct(Player $player, $reason, $quitMessage){
-		$this->player = $player;
-		$this->quitMessage = $quitMessage;
-		$this->reason = $reason;
-	}
+        /** @var string */
+        protected $reason;
 
-	public function getReason(){
-		return $this->reason;
-	}
+        public function __construct(Player $player, $reason, $quitMessage) {
+                $this->player = $player;
+                $this->quitMessage = $quitMessage;
+                $this->reason = $reason;
+        }
 
-	public function setQuitMessage($quitMessage){
-		$this->quitMessage = $quitMessage;
-	}
+        public function getReason() {
+                return $this->reason;
+        }
 
-	public function getQuitMessage(){
-		return $this->quitMessage;
-	}
+        public function setQuitMessage($quitMessage) {
+                $this->quitMessage = $quitMessage;
+        }
+
+        public function getQuitMessage() {
+                return $this->quitMessage;
+        }
 
 }

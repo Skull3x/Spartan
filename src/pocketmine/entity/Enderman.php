@@ -17,13 +17,12 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
 use pocketmine\inventory\InventoryHolder;
 
-class Enderman extends Monster implements InventoryHolder{
-
+class Enderman extends Monster implements InventoryHolder {
+        
 }

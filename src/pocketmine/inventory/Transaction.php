@@ -17,36 +17,36 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\inventory;
 
 use pocketmine\item\Item;
 
-interface Transaction{
+interface Transaction {
 
-	/**
-	 * @return Inventory
-	 */
-	public function getInventory();
+        /**
+         * @return Inventory
+         */
+        public function getInventory();
 
-	/**
-	 * @return int
-	 */
-	public function getSlot();
+        /**
+         * @return int
+         */
+        public function getSlot();
 
-	/**
-	 * @return Item
-	 */
-	public function getSourceItem();
+        /**
+         * @return Item
+         */
+        public function getSourceItem();
 
-	/**
-	 * @return Item
-	 */
-	public function getTargetItem();
+        /**
+         * @return Item
+         */
+        public function getTargetItem();
 
-	/**
-	 * @return float
-	 */
-	public function getCreationTime();
+        /**
+         * @return float
+         */
+        public function getCreationTime();
 }

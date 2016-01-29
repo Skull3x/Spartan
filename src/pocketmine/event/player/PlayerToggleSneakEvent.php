@@ -24,19 +24,20 @@ namespace pocketmine\event\player;
 use pocketmine\event\Cancellable;
 use pocketmine\Player;
 
-class PlayerToggleSneakEvent extends PlayerEvent implements Cancellable{
-	public static $handlerList = null;
+class PlayerToggleSneakEvent extends PlayerEvent implements Cancellable {
 
-	/** @var bool */
-	protected $isSneaking;
+        public static $handlerList = null;
 
-	public function __construct(Player $player, $isSneaking){
-		$this->player = $player;
-		$this->isSneaking = (bool) $isSneaking;
-	}
+        /** @var bool */
+        protected $isSneaking;
 
-	public function isSneaking(){
-		return $this->isSneaking;
-	}
+        public function __construct(Player $player, $isSneaking) {
+                $this->player = $player;
+                $this->isSneaking = (bool) $isSneaking;
+        }
+
+        public function isSneaking() {
+                return $this->isSneaking;
+        }
 
 }

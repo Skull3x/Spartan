@@ -25,26 +25,27 @@ use pocketmine\entity\Item;
 use pocketmine\event\Cancellable;
 use pocketmine\inventory\Inventory;
 
-class InventoryPickupItemEvent extends InventoryEvent implements Cancellable{
-	public static $handlerList = null;
+class InventoryPickupItemEvent extends InventoryEvent implements Cancellable {
 
-	/** @var Item */
-	private $item;
+        public static $handlerList = null;
 
-	/**
-	 * @param Inventory $inventory
-	 * @param Item      $item
-	 */
-	public function __construct(Inventory $inventory, Item $item){
-		$this->item = $item;
-		parent::__construct($inventory);
-	}
+        /** @var Item */
+        private $item;
 
-	/**
-	 * @return Item
-	 */
-	public function getItem(){
-		return $this->item;
-	}
+        /**
+         * @param Inventory $inventory
+         * @param Item      $item
+         */
+        public function __construct(Inventory $inventory, Item $item) {
+                $this->item = $item;
+                parent::__construct($inventory);
+        }
+
+        /**
+         * @return Item
+         */
+        public function getItem() {
+                return $this->item;
+        }
 
 }

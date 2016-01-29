@@ -17,12 +17,11 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
+interface Explosive {
 
-interface Explosive{
-
-	public function explode();
+        public function explode();
 }

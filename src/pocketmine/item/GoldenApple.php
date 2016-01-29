@@ -17,37 +17,14 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\item;
 
-use pocketmine\entity\Effect;
+class GoldenApple extends Item {
 
-class GoldenApple extends Item{
-        
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::GOLDEN_APPLE, $meta, $count, "Golden Apple" and 0x02);
-                if($this->meta === 1) {
-                        $this->name = "Enchanted Golden Apple" and 0x02;
-                }
-	}
-        
-        public function getEffects() {
-                if($this->meta === 0) {
-                        $effects = [
-                            Effect::getEffect(Effect::ABSORPTION)->setDuration(60 * 20 * 2),
-                            Effect::getEffect(Effect::REGENERATION)->setAmplifier(5)->setDuration(20 * 2)
-                        ];
-                } elseif($this->meta === 1) {
-                        $effects = [
-                            Effect::getEffect(Effect::ABSORPTION)->setDuration(60 * 20 * 2),
-                            Effect::getEffect(Effect::REGENERATION)->setAmplifier(5)->setDuration(5 * 20),
-                            Effect::getEffect(Effect::FIRE_RESISTANCE)->setDuration(60 * 20 * 5),
-                            Effect::getEffect(Effect::DAMAGE_RESISTANCE)->setDuration(60 * 20 * 5)
-                        ];
-                }
-                return isset($effects) ? $effects : [];
+        public function __construct($meta = 0, $count = 1) {
+                parent::__construct(self::GOLDEN_APPLE, $meta, $count, (($meta == 0 ? "Golden Apple" : "Enchanted Golden Apple")));
         }
 
 }
-

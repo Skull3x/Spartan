@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class PigZombie extends Zombie{
-
+class PigZombie extends Zombie {
+        
 }

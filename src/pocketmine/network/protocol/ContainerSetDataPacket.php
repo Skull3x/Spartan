@@ -17,29 +17,29 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class ContainerSetDataPacket extends DataPacket {
 
-class ContainerSetDataPacket extends DataPacket{
-	const NETWORK_ID = Info::CONTAINER_SET_DATA_PACKET;
+        const NETWORK_ID = Info::CONTAINER_SET_DATA_PACKET;
 
-	public $windowid;
-	public $property;
-	public $value;
+        public $windowid;
+        public $property;
+        public $value;
 
-	public function decode(){
+        public function decode() {
+                
+        }
 
-	}
-
-	public function encode(){
-		$this->reset();
-		$this->putByte($this->windowid);
-		$this->putShort($this->property);
-		$this->putShort($this->value);
-	}
+        public function encode() {
+                $this->reset();
+                $this->putByte($this->windowid);
+                $this->putShort($this->property);
+                $this->putShort($this->value);
+        }
 
 }

@@ -17,137 +17,139 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\permission;
 
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\PluginException;
 
-class PermissionAttachment{
-	/** @var PermissionRemovedExecutor */
-	private $removed = null;
+class PermissionAttachment {
 
-	/**
-	 * @var bool[]
-	 */
-	private $permissions = [];
+        /** @var PermissionRemovedExecutor */
+        private $removed = null;
 
-	/** @var Permissible */
-	private $permissible;
+        /**
+         * @var bool[]
+         */
+        private $permissions = [];
 
-	/** @var Plugin */
-	private $plugin;
+        /** @var Permissible */
+        private $permissible;
 
-	/**
-	 * @param Plugin      $plugin
-	 * @param Permissible $permissible
-	 *
-	 * @throws PluginException
-	 */
-	public function __construct(Plugin $plugin, Permissible $permissible){
-		if(!$plugin->isEnabled()){
-			throw new PluginException("Plugin " . $plugin->getDescription()->getName() . " is disabled");
-		}
+        /** @var Plugin */
+        private $plugin;
 
-		$this->permissible = $permissible;
-		$this->plugin = $plugin;
-	}
+        /**
+         * @param Plugin      $plugin
+         * @param Permissible $permissible
+         *
+         * @throws PluginException
+         */
+        public function __construct(Plugin $plugin, Permissible $permissible) {
+                if(!$plugin->isEnabled()) {
+                        throw new PluginException("Plugin " . $plugin->getDescription()->getName() . " is disabled");
+                }
 
-	/**
-	 * @return Plugin
-	 */
-	public function getPlugin(){
-		return $this->plugin;
-	}
+                $this->permissible = $permissible;
+                $this->plugin = $plugin;
+        }
 
-	/**
-	 * @param PermissionRemovedExecutor $ex
-	 */
-	public function setRemovalCallback(PermissionRemovedExecutor $ex){
-		$this->removed = $ex;
-	}
+        /**
+         * @return Plugin
+         */
+        public function getPlugin() {
+                return $this->plugin;
+        }
 
-	/**
-	 * @return PermissionRemovedExecutor
-	 */
-	public function getRemovalCallback(){
-		return $this->removed;
-	}
+        /**
+         * @param PermissionRemovedExecutor $ex
+         */
+        public function setRemovalCallback(PermissionRemovedExecutor $ex) {
+                $this->removed = $ex;
+        }
 
-	/**
-	 * @return Permissible
-	 */
-	public function getPermissible(){
-		return $this->permissible;
-	}
+        /**
+         * @return PermissionRemovedExecutor
+         */
+        public function getRemovalCallback() {
+                return $this->removed;
+        }
 
-	/**
-	 * @return bool[]
-	 */
-	public function getPermissions(){
-		return $this->permissions;
-	}
+        /**
+         * @return Permissible
+         */
+        public function getPermissible() {
+                return $this->permissible;
+        }
 
-	/**
-	 * @return bool[]
-	 */
-	public function clearPermissions(){
-		$this->permissions = [];
-		$this->permissible->recalculatePermissions();
-	}
+        /**
+         * @return bool[]
+         */
+        public function getPermissions() {
+                return $this->permissions;
+        }
 
-	/**
-	 * @param bool[] $permissions
-	 */
-	public function setPermissions(array $permissions){
-		foreach($permissions as $key => $value){
-			$this->permissions[$key] = (bool) $value;
-		}
-		$this->permissible->recalculatePermissions();
-	}
+        /**
+         * @return bool[]
+         */
+        public function clearPermissions() {
+                $this->permissions = [];
+                $this->permissible->recalculatePermissions();
+        }
 
-	/**
-	 * @param string[] $permissions
-	 */
-	public function unsetPermissions(array $permissions){
-		foreach($permissions as $node){
-			unset($this->permissions[$node]);
-		}
-		$this->permissible->recalculatePermissions();
-	}
+        /**
+         * @param bool[] $permissions
+         */
+        public function setPermissions(array $permissions) {
+                foreach($permissions as $key => $value) {
+                        $this->permissions[$key] = (bool) $value;
+                }
+                $this->permissible->recalculatePermissions();
+        }
 
-	/**
-	 * @param string|Permission $name
-	 * @param bool              $value
-	 */
-	public function setPermission($name, $value){
-		$name = $name instanceof Permission ? $name->getName() : $name;
-		if(isset($this->permissions[$name])){
-			if($this->permissions[$name] === $value){
-				return;
-			}
-			unset($this->permissions[$name]); //Fixes children getting overwritten
-		}
-		$this->permissions[$name] = $value;
-		$this->permissible->recalculatePermissions();
-	}
+        /**
+         * @param string[] $permissions
+         */
+        public function unsetPermissions(array $permissions) {
+                foreach($permissions as $node) {
+                        unset($this->permissions[$node]);
+                }
+                $this->permissible->recalculatePermissions();
+        }
 
-	/**
-	 * @param string|Permission $name
-	 */
-	public function unsetPermission($name){
-		$name = $name instanceof Permission ? $name->getName() : $name;
-		if(isset($this->permissions[$name])){
-			unset($this->permissions[$name]);
-			$this->permissible->recalculatePermissions();
-		}
-	}
+        /**
+         * @param string|Permission $name
+         * @param bool              $value
+         */
+        public function setPermission($name, $value) {
+                $name = $name instanceof Permission ? $name->getName() : $name;
+                if(isset($this->permissions[$name])) {
+                        if($this->permissions[$name] === $value) {
+                                return;
+                        }
+                        unset($this->permissions[$name]); //Fixes children getting overwritten
+                }
+                $this->permissions[$name] = $value;
+                $this->permissible->recalculatePermissions();
+        }
 
-	/**
-	 * @return void
-	 */
-	public function remove(){
-		$this->permissible->removeAttachment($this);
-	}
+        /**
+         * @param string|Permission $name
+         */
+        public function unsetPermission($name) {
+                $name = $name instanceof Permission ? $name->getName() : $name;
+                if(isset($this->permissions[$name])) {
+                        unset($this->permissions[$name]);
+                        $this->permissible->recalculatePermissions();
+                }
+        }
+
+        /**
+         * @return void
+         */
+        public function remove() {
+                $this->permissible->removeAttachment($this);
+        }
+
 }

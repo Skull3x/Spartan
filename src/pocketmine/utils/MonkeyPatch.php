@@ -17,12 +17,14 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\utils;
 
-class MonkeyPatch{
-	public function __construct(){
+class MonkeyPatch {
 
-	}
+        public function __construct() {
+                
+        }
+
 }

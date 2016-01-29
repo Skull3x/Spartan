@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Spider extends Monster{
-
+class Spider extends Monster {
+        
 }

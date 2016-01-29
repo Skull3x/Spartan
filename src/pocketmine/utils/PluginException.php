@@ -17,10 +17,10 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\utils;
 
-class PluginException extends ServerException{
-
+class PluginException extends ServerException {
+        
 }

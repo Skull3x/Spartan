@@ -17,19 +17,20 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\level\generator\hell;
 
 use pocketmine\level\generator\biome\Biome;
 
-class HellBiome extends Biome{
+class HellBiome extends Biome {
 
-	public function getName(){
-		return "Hell";
-	}
+        public function getName() {
+                return "Hell";
+        }
 
-	public function getColor(){
-		return 0;
-	}
+        public function getColor() {
+                return 0;
+        }
+
 }

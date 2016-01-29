@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Creeper extends Monster implements Explosive{
-
+class Creeper extends Monster implements Explosive {
+        
 }

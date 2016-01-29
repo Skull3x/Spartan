@@ -17,37 +17,38 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\metadata;
 
 use pocketmine\plugin\Plugin;
 
-abstract class MetadataValue{
-	/** @var \WeakRef<Plugin> */
-	protected $owningPlugin;
+abstract class MetadataValue {
 
-	protected function __construct(Plugin $owningPlugin){
-		$this->owningPlugin = new \WeakRef($owningPlugin);
-	}
+        /** @var \WeakRef<Plugin> */
+        protected $owningPlugin;
 
-	/**
-	 * @return Plugin
-	 */
-	public function getOwningPlugin(){
-		return $this->owningPlugin->get();
-	}
+        protected function __construct(Plugin $owningPlugin) {
+                $this->owningPlugin = new \WeakRef($owningPlugin);
+        }
 
-	/**
-	 * Fetches the value of this metadata item.
-	 *
-	 * @return mixed
-	 */
-	public abstract function value();
+        /**
+         * @return Plugin
+         */
+        public function getOwningPlugin() {
+                return $this->owningPlugin->get();
+        }
 
-	/**
-	 * Invalidates this metadata item, forcing it to recompute when next
-	 * accessed.
-	 */
-	public abstract function invalidate();
+        /**
+         * Fetches the value of this metadata item.
+         *
+         * @return mixed
+         */
+        public abstract function value();
+
+        /**
+         * Invalidates this metadata item, forcing it to recompute when next
+         * accessed.
+         */
+        public abstract function invalidate();
 }

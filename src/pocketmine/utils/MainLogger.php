@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\utils;
 
@@ -25,217 +25,219 @@ use LogLevel;
 use pocketmine\Thread;
 use pocketmine\Worker;
 
-class MainLogger extends \AttachableThreadedLogger{
-	protected $logStream;
-	protected $shutdown;
-	protected $logDebug;
-	private $logResource;
-	/** @var MainLogger */
-	public static $logger = null;
+class MainLogger extends \AttachableThreadedLogger {
 
-	/**
-	 * @param string $logFile
-	 * @param bool   $logDebug
-	 *
-	 * @throws \RuntimeException
-	 */
-	public function __construct($logFile, $logDebug = false){
-		if(static::$logger instanceof MainLogger){
-			throw new \RuntimeException("MainLogger has been already created");
-		}
-		static::$logger = $this;
-		$this->logDebug = (bool) $logDebug;
-		$this->logStream = \ThreadedFactory::create();
-		$this->start();
-	}
+        protected $logStream;
+        protected $shutdown;
+        protected $logDebug;
+        private $logResource;
 
-	/**
-	 * @return MainLogger
-	 */
-	public static function getLogger(){
-		return static::$logger;
-	}
+        /** @var MainLogger */
+        public static $logger = null;
 
-	public function emergency($message){
+        /**
+         * @param string $logFile
+         * @param bool   $logDebug
+         *
+         * @throws \RuntimeException
+         */
+        public function __construct($logFile, $logDebug = false) {
+                if(static::$logger instanceof MainLogger) {
+                        throw new \RuntimeException("MainLogger has been already created");
+                }
+                static::$logger = $this;
+                $this->logDebug = (bool) $logDebug;
+                $this->logStream = \ThreadedFactory::create();
+                $this->start();
+        }
+
+        /**
+         * @return MainLogger
+         */
+        public static function getLogger() {
+                return static::$logger;
+        }
+
+        public function emergency($message) {
                 $this->server($message, Terminal::$COLOR_RED);
-	}
+        }
 
-	public function alert($message){
+        public function alert($message) {
                 $this->server($message, Terminal::$COLOR_GOLD);
-	}
+        }
 
-	public function critical($message){
+        public function critical($message) {
                 $this->server($message, Terminal::$COLOR_RED);
-	}
+        }
 
-	public function error($message){
+        public function error($message) {
                 $this->server($message, Terminal::$COLOR_DARK_RED);
-	}
+        }
 
-	public function warning($message){
+        public function warning($message) {
                 $this->server($message, Terminal::$COLOR_YELLOW);
-	}
+        }
 
-	public function notice($message){
+        public function notice($message) {
                 $this->server($message, Terminal::$COLOR_AQUA);
-	}
+        }
 
-	public function info($message){
+        public function info($message) {
                 $this->server($message);
-	}
-        
+        }
+
         public function server($message, $color = "\x1b[38;5;145m") {
                 $this->send($message, \LogLevel::INFO, Terminal::$COLOR_AQUA . "Server> " . $color, null);
         }
-        
+
         public function game($message, $color = "\x1b[38;5;145m") {
                 $this->send($message, \LogLevel::INFO, Terminal::$COLOR_LIGHT_PURPLE . "Game> " . $color, null);
         }
-        
+
         public function spartan($message, $color = "\x1b[38;5;145m") {
                 $this->send($message, \LogLevel::INFO, Terminal::$COLOR_GOLD . "Spartan> " . $color, null);
         }
 
-	public function debug($message){
-		if($this->logDebug === false){
-			return;
-		}
+        public function debug($message) {
+                if($this->logDebug === false) {
+                        return;
+                }
                 $this->server($message);
-	}
+        }
 
-	/**
-	 * @param bool $logDebug
-	 */
-	public function setLogDebug($logDebug){
-		$this->logDebug = (bool) $logDebug;
-	}
+        /**
+         * @param bool $logDebug
+         */
+        public function setLogDebug($logDebug) {
+                $this->logDebug = (bool) $logDebug;
+        }
 
-	public function logException(\Exception $e, $trace = null){
-		if($trace === null){
-			$trace = $e->getTrace();
-		}
-		$errstr = $e->getMessage();
-		$errfile = $e->getFile();
-		$errno = $e->getCode();
-		$errline = $e->getLine();
+        public function logException(\Exception $e, $trace = null) {
+                if($trace === null) {
+                        $trace = $e->getTrace();
+                }
+                $errstr = $e->getMessage();
+                $errfile = $e->getFile();
+                $errno = $e->getCode();
+                $errline = $e->getLine();
 
-		$errorConversion = [
-			0 => "EXCEPTION",
-			E_ERROR => "E_ERROR",
-			E_WARNING => "E_WARNING",
-			E_PARSE => "E_PARSE",
-			E_NOTICE => "E_NOTICE",
-			E_CORE_ERROR => "E_CORE_ERROR",
-			E_CORE_WARNING => "E_CORE_WARNING",
-			E_COMPILE_ERROR => "E_COMPILE_ERROR",
-			E_COMPILE_WARNING => "E_COMPILE_WARNING",
-			E_USER_ERROR => "E_USER_ERROR",
-			E_USER_WARNING => "E_USER_WARNING",
-			E_USER_NOTICE => "E_USER_NOTICE",
-			E_STRICT => "E_STRICT",
-			E_RECOVERABLE_ERROR => "E_RECOVERABLE_ERROR",
-			E_DEPRECATED => "E_DEPRECATED",
-			E_USER_DEPRECATED => "E_USER_DEPRECATED",
-		];
-		if($errno === 0){
-			$type = LogLevel::CRITICAL;
-		}else{
-			$type = ($errno === E_ERROR or $errno === E_USER_ERROR) ? LogLevel::ERROR : (($errno === E_USER_WARNING or $errno === E_WARNING) ? LogLevel::WARNING : LogLevel::NOTICE);
-		}
-		$errno = isset($errorConversion[$errno]) ? $errorConversion[$errno] : $errno;
-		if(($pos = strpos($errstr, "\n")) !== false){
-			$errstr = substr($errstr, 0, $pos);
-		}
-		$errfile = \pocketmine\cleanPath($errfile);
-		$this->log($type, get_class($e) . ": \"$errstr\" ($errno) in \"$errfile\" at line $errline");
-		foreach(@\pocketmine\getTrace(1, $trace) as $i => $line){
-			$this->debug($line);
-		}
-	}
+                $errorConversion = [
+                    0 => "EXCEPTION",
+                    E_ERROR => "E_ERROR",
+                    E_WARNING => "E_WARNING",
+                    E_PARSE => "E_PARSE",
+                    E_NOTICE => "E_NOTICE",
+                    E_CORE_ERROR => "E_CORE_ERROR",
+                    E_CORE_WARNING => "E_CORE_WARNING",
+                    E_COMPILE_ERROR => "E_COMPILE_ERROR",
+                    E_COMPILE_WARNING => "E_COMPILE_WARNING",
+                    E_USER_ERROR => "E_USER_ERROR",
+                    E_USER_WARNING => "E_USER_WARNING",
+                    E_USER_NOTICE => "E_USER_NOTICE",
+                    E_STRICT => "E_STRICT",
+                    E_RECOVERABLE_ERROR => "E_RECOVERABLE_ERROR",
+                    E_DEPRECATED => "E_DEPRECATED",
+                    E_USER_DEPRECATED => "E_USER_DEPRECATED",
+                ];
+                if($errno === 0) {
+                        $type = LogLevel::CRITICAL;
+                } else {
+                        $type = ($errno === E_ERROR or $errno === E_USER_ERROR) ? LogLevel::ERROR : (($errno === E_USER_WARNING or $errno === E_WARNING) ? LogLevel::WARNING : LogLevel::NOTICE);
+                }
+                $errno = isset($errorConversion[$errno]) ? $errorConversion[$errno] : $errno;
+                if(($pos = strpos($errstr, "\n")) !== false) {
+                        $errstr = substr($errstr, 0, $pos);
+                }
+                $errfile = \pocketmine\cleanPath($errfile);
+                $this->log($type, get_class($e) . ": \"$errstr\" ($errno) in \"$errfile\" at line $errline");
+                foreach(@\pocketmine\getTrace(1, $trace) as $i => $line) {
+                        $this->debug($line);
+                }
+        }
 
-	public function log($level, $message){
-		switch($level){
-			case LogLevel::EMERGENCY:
-				$this->emergency($message);
-				break;
-			case LogLevel::ALERT:
-				$this->alert($message);
-				break;
-			case LogLevel::CRITICAL:
-				$this->critical($message);
-				break;
-			case LogLevel::ERROR:
-				$this->error($message);
-				break;
-			case LogLevel::WARNING:
-				$this->warning($message);
-				break;
-			case LogLevel::NOTICE:
-				$this->notice($message);
-				break;
-			case LogLevel::INFO:
-				$this->info($message);
-				break;
-			case LogLevel::DEBUG:
-				$this->debug($message);
-				break;
-		}
-	}
+        public function log($level, $message) {
+                switch ($level) {
+                        case LogLevel::EMERGENCY:
+                                $this->emergency($message);
+                                break;
+                        case LogLevel::ALERT:
+                                $this->alert($message);
+                                break;
+                        case LogLevel::CRITICAL:
+                                $this->critical($message);
+                                break;
+                        case LogLevel::ERROR:
+                                $this->error($message);
+                                break;
+                        case LogLevel::WARNING:
+                                $this->warning($message);
+                                break;
+                        case LogLevel::NOTICE:
+                                $this->notice($message);
+                                break;
+                        case LogLevel::INFO:
+                                $this->info($message);
+                                break;
+                        case LogLevel::DEBUG:
+                                $this->debug($message);
+                                break;
+                }
+        }
 
-	public function shutdown(){
-		$this->shutdown = true;
-	}
+        public function shutdown() {
+                $this->shutdown = true;
+        }
 
-	protected function send($message, $level, $prefix, $color){
+        protected function send($message, $level, $prefix, $color) {
 
-		$thread = \Thread::getCurrentThread();
-		if($thread === null){
-			$threadName = "Server thread";
-		}elseif($thread instanceof Thread or $thread instanceof Worker){
-			$threadName = $thread->getThreadName() . " thread";
-		}else{
-			$threadName = (new \ReflectionClass($thread))->getShortName() . " thread";
-		}
+                $thread = \Thread::getCurrentThread();
+                if($thread === null) {
+                        $threadName = "Server thread";
+                } elseif($thread instanceof Thread or $thread instanceof Worker) {
+                        $threadName = $thread->getThreadName() . " thread";
+                } else {
+                        $threadName = (new \ReflectionClass($thread))->getShortName() . " thread";
+                }
 
-		$message = TextFormat::toANSI("$prefix" . " " . $message . TextFormat::RESET);
-		$cleanMessage = TextFormat::clean($message);
+                $message = TextFormat::toANSI("$prefix" . " " . $message . TextFormat::RESET);
+                $cleanMessage = TextFormat::clean($message);
 
-		if(!Terminal::hasFormattingCodes()){
-			echo $cleanMessage . PHP_EOL;
-		}else{
-			echo $message . PHP_EOL;
-		}
+                if(!Terminal::hasFormattingCodes()) {
+                        echo $cleanMessage . PHP_EOL;
+                } else {
+                        echo $message . PHP_EOL;
+                }
 
-		if($this->attachment instanceof \ThreadedLoggerAttachment){
-			$this->attachment->call($level, $message);
-		}
+                if($this->attachment instanceof \ThreadedLoggerAttachment) {
+                        $this->attachment->call($level, $message);
+                }
 
-		$this->logStream[] = $cleanMessage . "\r\n\n";
-		if($this->logStream->count() === 1){
-			$this->synchronized(function(){
-				$this->notify();
-			});
-		}
-	}
+                $this->logStream[] = $cleanMessage . "\r\n\n";
+                if($this->logStream->count() === 1) {
+                        $this->synchronized(function() {
+                                $this->notify();
+                        });
+                }
+        }
 
-	public function run(){
-		$this->shutdown = false;
+        public function run() {
+                $this->shutdown = false;
 
-		while($this->shutdown === false){
-			$this->synchronized(function(){
-				while($this->logStream->count() > 0){
-					$chunk = $this->logStream->shift();
-				}
+                while ($this->shutdown === false) {
+                        $this->synchronized(function() {
+                                while ($this->logStream->count() > 0) {
+                                        $chunk = $this->logStream->shift();
+                                }
 
-				$this->wait(25000);
-			});
-		}
+                                $this->wait(25000);
+                        });
+                }
 
-		if($this->logStream->count() > 0){
-			while($this->logStream->count() > 0){
-				$chunk = $this->logStream->shift();
-			}
-		}
+                if($this->logStream->count() > 0) {
+                        while ($this->logStream->count() > 0) {
+                                $chunk = $this->logStream->shift();
+                        }
+                }
+        }
 
-	}
 }

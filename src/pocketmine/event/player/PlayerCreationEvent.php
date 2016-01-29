@@ -28,112 +28,117 @@ use pocketmine\Player;
 /**
  * Allows the creation of players overriding the base Player class
  */
-class PlayerCreationEvent extends Event{
-	public static $handlerList = null;
+class PlayerCreationEvent extends Event {
 
-	/** @var SourceInterface */
-	private $interface;
-	/** @var mixed */
-	private $clientId;
-	/** @var string */
-	private $address;
-	/** @var int */
-	private $port;
+        public static $handlerList = null;
 
-	/** @var Player::class */
-	private $baseClass;
-	/** @var Player::class */
-	private $playerClass;
+        /** @var SourceInterface */
+        private $interface;
 
-	/**
-	 * @param SourceInterface $interface
-	 * @param Player::class   $baseClass
-	 * @param Player::class   $playerClass
-	 * @param mixed           $clientId
-	 * @param string          $address
-	 * @param int             $port
-	 */
-	public function __construct(SourceInterface $interface, $baseClass, $playerClass, $clientId, $address, $port){
-		$this->interface = $interface;
-		$this->clientId = $clientId;
-		$this->address = $address;
-		$this->port = $port;
+        /** @var mixed */
+        private $clientId;
 
-		if(!is_a($baseClass, Player::class, true)){
-			throw new \RuntimeException("Base class $baseClass must extend " . Player::class);
-		}
+        /** @var string */
+        private $address;
 
-		$this->baseClass = $baseClass;
+        /** @var int */
+        private $port;
 
-		if(!is_a($playerClass, Player::class, true)){
-			throw new \RuntimeException("Class $playerClass must extend " . Player::class);
-		}
+        /** @var Player::class */
+        private $baseClass;
 
-		$this->playerClass = $playerClass;
-	}
+        /** @var Player::class */
+        private $playerClass;
 
-	/**
-	 * @return SourceInterface
-	 */
-	public function getInterface(){
-		return $this->interface;
-	}
+        /**
+         * @param SourceInterface $interface
+         * @param Player::class   $baseClass
+         * @param Player::class   $playerClass
+         * @param mixed           $clientId
+         * @param string          $address
+         * @param int             $port
+         */
+        public function __construct(SourceInterface $interface, $baseClass, $playerClass, $clientId, $address, $port) {
+                $this->interface = $interface;
+                $this->clientId = $clientId;
+                $this->address = $address;
+                $this->port = $port;
 
-	/**
-	 * @return string
-	 */
-	public function getAddress(){
-		return $this->address;
-	}
+                if(!is_a($baseClass, Player::class, true)) {
+                        throw new \RuntimeException("Base class $baseClass must extend " . Player::class);
+                }
 
-	/**
-	 * @return int
-	 */
-	public function getPort(){
-		return $this->port;
-	}
+                $this->baseClass = $baseClass;
 
-	/**
-	 * @return mixed
-	 */
-	public function getClientId(){
-		return $this->clientId;
-	}
+                if(!is_a($playerClass, Player::class, true)) {
+                        throw new \RuntimeException("Class $playerClass must extend " . Player::class);
+                }
 
-	/**
-	 * @return Player::class
-	 */
-	public function getBaseClass(){
-		return $this->baseClass;
-	}
+                $this->playerClass = $playerClass;
+        }
 
-	/**
-	 * @param Player::class $class
-	 */
-	public function setBaseClass($class){
-		if(!is_a($class, $this->baseClass, true)){
-			throw new \RuntimeException("Base class $class must extend " . $this->baseClass);
-		}
+        /**
+         * @return SourceInterface
+         */
+        public function getInterface() {
+                return $this->interface;
+        }
 
-		$this->baseClass = $class;
-	}
+        /**
+         * @return string
+         */
+        public function getAddress() {
+                return $this->address;
+        }
 
-	/**
-	 * @return Player::class
-	 */
-	public function getPlayerClass(){
-		return $this->playerClass;
-	}
+        /**
+         * @return int
+         */
+        public function getPort() {
+                return $this->port;
+        }
 
-	/**
-	 * @param Player::class $class
-	 */
-	public function setPlayerClass($class){
-		if(!is_a($class, $this->baseClass, true)){
-			throw new \RuntimeException("Class $class must extend " . $this->baseClass);
-		}
+        /**
+         * @return mixed
+         */
+        public function getClientId() {
+                return $this->clientId;
+        }
 
-		$this->playerClass = $class;
-	}
+        /**
+         * @return Player::class
+         */
+        public function getBaseClass() {
+                return $this->baseClass;
+        }
+
+        /**
+         * @param Player::class $class
+         */
+        public function setBaseClass($class) {
+                if(!is_a($class, $this->baseClass, true)) {
+                        throw new \RuntimeException("Base class $class must extend " . $this->baseClass);
+                }
+
+                $this->baseClass = $class;
+        }
+
+        /**
+         * @return Player::class
+         */
+        public function getPlayerClass() {
+                return $this->playerClass;
+        }
+
+        /**
+         * @param Player::class $class
+         */
+        public function setPlayerClass($class) {
+                if(!is_a($class, $this->baseClass, true)) {
+                        throw new \RuntimeException("Class $class must extend " . $this->baseClass);
+                }
+
+                $this->playerClass = $class;
+        }
 
 }

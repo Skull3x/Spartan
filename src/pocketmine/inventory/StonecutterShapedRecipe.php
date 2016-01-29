@@ -17,10 +17,10 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\inventory;
 
-class StonecutterShapedRecipe extends ShapedRecipe{
-
+class StonecutterShapedRecipe extends ShapedRecipe {
+        
 }

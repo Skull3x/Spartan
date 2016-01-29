@@ -17,25 +17,25 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class SetDifficultyPacket extends DataPacket {
 
-class SetDifficultyPacket extends DataPacket{
-	const NETWORK_ID = Info::SET_DIFFICULTY_PACKET;
+        const NETWORK_ID = Info::SET_DIFFICULTY_PACKET;
 
-	public $difficulty;
+        public $difficulty;
 
-	public function decode(){
-		$this->difficulty = $this->getInt();
-	}
+        public function decode() {
+                $this->difficulty = $this->getInt();
+        }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->difficulty);
-	}
+        public function encode() {
+                $this->reset();
+                $this->putInt($this->difficulty);
+        }
 
 }

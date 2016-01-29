@@ -17,14 +17,15 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\scheduler;
 
-class GarbageCollectionTask extends AsyncTask{
+class GarbageCollectionTask extends AsyncTask {
 
-	public function onRun(){
-		gc_enable();
-		gc_collect_cycles();
-	}
+        public function onRun() {
+                gc_enable();
+                gc_collect_cycles();
+        }
+
 }

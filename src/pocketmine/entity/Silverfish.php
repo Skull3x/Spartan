@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Silverfish extends Monster{
-
+class Silverfish extends Monster {
+        
 }

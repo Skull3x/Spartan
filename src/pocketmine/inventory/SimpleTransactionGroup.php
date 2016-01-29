@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\inventory;
 
@@ -29,137 +29,140 @@ use pocketmine\Server;
 /**
  * This TransactionGroup only allows doing Transaction between one / two inventories
  */
-class SimpleTransactionGroup implements TransactionGroup{
-	private $creationTime;
-	protected $hasExecuted = false;
-	/** @var Player */
-	protected $source = null;
+class SimpleTransactionGroup implements TransactionGroup {
 
-	/** @var Inventory[] */
-	protected $inventories = [];
+        private $creationTime;
+        protected $hasExecuted = false;
 
-	/** @var Transaction[] */
-	protected $transactions = [];
+        /** @var Player */
+        protected $source = null;
 
-	/**
-	 * @param Player $source
-	 */
-	public function __construct(Player $source = null){
-		$this->creationTime = microtime(true);
-		$this->source = $source;
-	}
+        /** @var Inventory[] */
+        protected $inventories = [];
 
-	/**
-	 * @return Player
-	 */
-	public function getSource(){
-		return $this->source;
-	}
+        /** @var Transaction[] */
+        protected $transactions = [];
 
-	public function getCreationTime(){
-		return $this->creationTime;
-	}
+        /**
+         * @param Player $source
+         */
+        public function __construct(Player $source = null) {
+                $this->creationTime = microtime(true);
+                $this->source = $source;
+        }
 
-	public function getInventories(){
-		return $this->inventories;
-	}
+        /**
+         * @return Player
+         */
+        public function getSource() {
+                return $this->source;
+        }
 
-	public function getTransactions(){
-		return $this->transactions;
-	}
+        public function getCreationTime() {
+                return $this->creationTime;
+        }
 
-	public function addTransaction(Transaction $transaction){
-		if(isset($this->transactions[spl_object_hash($transaction)])){
-			return;
-		}
-		foreach($this->transactions as $hash => $tx){
-			if($tx->getInventory() === $transaction->getInventory() and $tx->getSlot() === $transaction->getSlot()){
-				if($transaction->getCreationTime() >= $tx->getCreationTime()){
-					unset($this->transactions[$hash]);
-				}else{
-					return;
-				}
-			}
-		}
-		$this->transactions[spl_object_hash($transaction)] = $transaction;
-		$this->inventories[spl_object_hash($transaction->getInventory())] = $transaction->getInventory();
-	}
+        public function getInventories() {
+                return $this->inventories;
+        }
 
-	/**
-	 * @param Item[] $needItems
-	 * @param Item[] $haveItems
-	 *
-	 * @return bool
-	 */
-	protected function matchItems(array &$needItems, array &$haveItems){
-		foreach($this->transactions as $key => $ts){
-			if($ts->getTargetItem()->getId() !== Item::AIR){
-				$needItems[] = $ts->getTargetItem();
-			}
-			$checkSourceItem = $ts->getInventory()->getItem($ts->getSlot());
-			$sourceItem = $ts->getSourceItem();
-			if(!$checkSourceItem->deepEquals($sourceItem) or $sourceItem->getCount() !== $checkSourceItem->getCount()){
-				return false;
-			}
-			if($sourceItem->getId() !== Item::AIR){
-				$haveItems[] = $sourceItem;
-			}
-		}
+        public function getTransactions() {
+                return $this->transactions;
+        }
 
-		foreach($needItems as $i => $needItem){
-			foreach($haveItems as $j => $haveItem){
-				if($needItem->deepEquals($haveItem)){
-					$amount = min($needItem->getCount(), $haveItem->getCount());
-					$needItem->setCount($needItem->getCount() - $amount);
-					$haveItem->setCount($haveItem->getCount() - $amount);
-					if($haveItem->getCount() === 0){
-						unset($haveItems[$j]);
-					}
-					if($needItem->getCount() === 0){
-						unset($needItems[$i]);
-						break;
-					}
-				}
-			}
-		}
+        public function addTransaction(Transaction $transaction) {
+                if(isset($this->transactions[spl_object_hash($transaction)])) {
+                        return;
+                }
+                foreach($this->transactions as $hash => $tx) {
+                        if($tx->getInventory() === $transaction->getInventory() and $tx->getSlot() === $transaction->getSlot()) {
+                                if($transaction->getCreationTime() >= $tx->getCreationTime()) {
+                                        unset($this->transactions[$hash]);
+                                } else {
+                                        return;
+                                }
+                        }
+                }
+                $this->transactions[spl_object_hash($transaction)] = $transaction;
+                $this->inventories[spl_object_hash($transaction->getInventory())] = $transaction->getInventory();
+        }
 
-		return true;
-	}
+        /**
+         * @param Item[] $needItems
+         * @param Item[] $haveItems
+         *
+         * @return bool
+         */
+        protected function matchItems(array &$needItems, array &$haveItems) {
+                foreach($this->transactions as $key => $ts) {
+                        if($ts->getTargetItem()->getId() !== Item::AIR) {
+                                $needItems[] = $ts->getTargetItem();
+                        }
+                        $checkSourceItem = $ts->getInventory()->getItem($ts->getSlot());
+                        $sourceItem = $ts->getSourceItem();
+                        if(!$checkSourceItem->deepEquals($sourceItem) or $sourceItem->getCount() !== $checkSourceItem->getCount()) {
+                                return false;
+                        }
+                        if($sourceItem->getId() !== Item::AIR) {
+                                $haveItems[] = $sourceItem;
+                        }
+                }
 
-	public function canExecute(){
-		$haveItems = [];
-		$needItems = [];
+                foreach($needItems as $i => $needItem) {
+                        foreach($haveItems as $j => $haveItem) {
+                                if($needItem->deepEquals($haveItem)) {
+                                        $amount = min($needItem->getCount(), $haveItem->getCount());
+                                        $needItem->setCount($needItem->getCount() - $amount);
+                                        $haveItem->setCount($haveItem->getCount() - $amount);
+                                        if($haveItem->getCount() === 0) {
+                                                unset($haveItems[$j]);
+                                        }
+                                        if($needItem->getCount() === 0) {
+                                                unset($needItems[$i]);
+                                                break;
+                                        }
+                                }
+                        }
+                }
 
-		return $this->matchItems($haveItems, $needItems) and count($haveItems) === 0 and count($needItems) === 0 and count($this->transactions) > 0;
-	}
+                return true;
+        }
 
-	public function execute(){
-		if($this->hasExecuted() or !$this->canExecute()){
-			return false;
-		}
+        public function canExecute() {
+                $haveItems = [];
+                $needItems = [];
 
-		Server::getInstance()->getPluginManager()->callEvent($ev = new InventoryTransactionEvent($this));
-		if($ev->isCancelled()){
-			foreach($this->inventories as $inventory){
-				if($inventory instanceof PlayerInventory){
-					$inventory->sendArmorContents($this->getSource());
-				}
-				$inventory->sendContents($this->getSource());
-			}
+                return $this->matchItems($haveItems, $needItems) and count($haveItems) === 0 and count($needItems) === 0 and count($this->transactions) > 0;
+        }
 
-			return false;
-		}
+        public function execute() {
+                if($this->hasExecuted() or ! $this->canExecute()) {
+                        return false;
+                }
 
-		foreach($this->transactions as $transaction){
-			$transaction->getInventory()->setItem($transaction->getSlot(), $transaction->getTargetItem());
-		}
+                Server::getInstance()->getPluginManager()->callEvent($ev = new InventoryTransactionEvent($this));
+                if($ev->isCancelled()) {
+                        foreach($this->inventories as $inventory) {
+                                if($inventory instanceof PlayerInventory) {
+                                        $inventory->sendArmorContents($this->getSource());
+                                }
+                                $inventory->sendContents($this->getSource());
+                        }
 
-		$this->hasExecuted = true;
+                        return false;
+                }
 
-		return true;
-	}
+                foreach($this->transactions as $transaction) {
+                        $transaction->getInventory()->setItem($transaction->getSlot(), $transaction->getTargetItem());
+                }
 
-	public function hasExecuted(){
-		return $this->hasExecuted;
-	}
+                $this->hasExecuted = true;
+
+                return true;
+        }
+
+        public function hasExecuted() {
+                return $this->hasExecuted;
+        }
+
 }

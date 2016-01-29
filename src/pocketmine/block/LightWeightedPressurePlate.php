@@ -17,14 +17,16 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-class Camera extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::CAMERA, $meta, $count, "Camera");
-	}
+class LightWeightedPressurePlate extends PressurePlate {
+
+        protected $id = self::LIGHT_WEIGHTED_PRESSURE_PLATE;
+
+        public function getName() {
+                return "Light Weighted Pressure Plate";
+        }
 
 }
-

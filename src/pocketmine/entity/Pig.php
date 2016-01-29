@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Pig extends Animal implements Rideable{
-
+class Pig extends Animal implements Rideable {
+        
 }

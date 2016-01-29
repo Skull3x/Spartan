@@ -17,16 +17,16 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\block;
 
+class FenceGateSpruce extends FenceGate {
 
-class FenceGateSpruce extends FenceGate{
+        protected $id = self::FENCE_GATE_SPRUCE;
 
-	protected $id = self::FENCE_GATE_SPRUCE;
+        public function getName() {
+                return "Spruce Fence Gate";
+        }
 
-	public function getName(){
-		return "Spruce Fence Gate";
-	}
 }

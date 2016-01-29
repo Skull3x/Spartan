@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Egg extends Projectile{
-
+class Egg extends Projectile {
+        
 }

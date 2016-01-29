@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\utils;
 
@@ -28,275 +28,272 @@ use pocketmine\math\Vector3;
 /**
  * This class performs ray tracing and iterates along blocks on a line
  */
-class BlockIterator implements \Iterator{
+class BlockIterator implements \Iterator {
 
-	/** @var Level */
-	private $level;
-	private $maxDistance;
+        /** @var Level */
+        private $level;
+        private $maxDistance;
+        private static $gridSize = 16777216; //1 << 24
+        private $end = false;
 
-	private static $gridSize = 16777216; //1 << 24
+        /** @var \SplFixedArray<Block>[3] */
+        private $blockQueue;
+        private $currentBlock = 0;
 
-	private $end = false;
+        /** @var Block */
+        private $currentBlockObject = null;
+        private $currentDistance = 0;
+        private $maxDistanceInt = 0;
+        private $secondError;
+        private $thirdError;
+        private $secondStep;
+        private $thirdStep;
+        private $mainFace;
+        private $secondFace;
+        private $thirdFace;
 
-	/** @var \SplFixedArray<Block>[3] */
-	private $blockQueue;
-	private $currentBlock = 0;
-	/** @var Block */
-	private $currentBlockObject = null;
-	private $currentDistance = 0;
-	private $maxDistanceInt = 0;
+        public function __construct(Level $level, Vector3 $start, Vector3 $direction, $yOffset = 0, $maxDistance = 0) {
+                $this->level = $level;
+                $this->maxDistance = (int) $maxDistance;
+                $this->blockQueue = new \SplFixedArray(3);
 
-	private $secondError;
-	private $thirdError;
+                $startClone = new Vector3($start->x, $start->y, $start->z);
+                $startClone->y += $yOffset;
 
-	private $secondStep;
-	private $thirdStep;
+                $this->currentDistance = 0;
 
-	private $mainFace;
-	private $secondFace;
-	private $thirdFace;
+                $mainDirection = 0;
+                $secondDirection = 0;
+                $thirdDirection = 0;
 
-	public function __construct(Level $level, Vector3 $start, Vector3 $direction, $yOffset = 0, $maxDistance = 0){
-		$this->level = $level;
-		$this->maxDistance = (int) $maxDistance;
-		$this->blockQueue = new \SplFixedArray(3);
+                $mainPosition = 0;
+                $secondPosition = 0;
+                $thirdPosition = 0;
 
-		$startClone = new Vector3($start->x, $start->y, $start->z);
-		$startClone->y += $yOffset;
+                $pos = new Vector3($startClone->x, $startClone->y, $startClone->z);
+                $startBlock = $this->level->getBlock(new Vector3(floor($pos->x), floor($pos->y), floor($pos->z)));
 
-		$this->currentDistance = 0;
+                if($this->getXLength($direction) > $mainDirection) {
+                        $this->mainFace = $this->getXFace($direction);
+                        $mainDirection = $this->getXLength($direction);
+                        $mainPosition = $this->getXPosition($direction, $startClone, $startBlock);
 
-		$mainDirection = 0;
-		$secondDirection = 0;
-		$thirdDirection = 0;
+                        $this->secondFace = $this->getYFace($direction);
+                        $secondDirection = $this->getYLength($direction);
+                        $secondPosition = $this->getYPosition($direction, $startClone, $startBlock);
 
-		$mainPosition = 0;
-		$secondPosition = 0;
-		$thirdPosition = 0;
+                        $this->thirdFace = $this->getZFace($direction);
+                        $thirdDirection = $this->getZLength($direction);
+                        $thirdPosition = $this->getZPosition($direction, $startClone, $startBlock);
+                }
+                if($this->getYLength($direction) > $mainDirection) {
+                        $this->mainFace = $this->getYFace($direction);
+                        $mainDirection = $this->getYLength($direction);
+                        $mainPosition = $this->getYPosition($direction, $startClone, $startBlock);
 
-		$pos = new Vector3($startClone->x, $startClone->y, $startClone->z);
-		$startBlock = $this->level->getBlock(new Vector3(floor($pos->x), floor($pos->y), floor($pos->z)));
+                        $this->secondFace = $this->getZFace($direction);
+                        $secondDirection = $this->getZLength($direction);
+                        $secondPosition = $this->getZPosition($direction, $startClone, $startBlock);
 
-		if($this->getXLength($direction) > $mainDirection){
-			$this->mainFace = $this->getXFace($direction);
-			$mainDirection = $this->getXLength($direction);
-			$mainPosition = $this->getXPosition($direction, $startClone, $startBlock);
+                        $this->thirdFace = $this->getXFace($direction);
+                        $thirdDirection = $this->getXLength($direction);
+                        $thirdPosition = $this->getXPosition($direction, $startClone, $startBlock);
+                }
+                if($this->getZLength($direction) > $mainDirection) {
+                        $this->mainFace = $this->getZFace($direction);
+                        $mainDirection = $this->getZLength($direction);
+                        $mainPosition = $this->getZPosition($direction, $startClone, $startBlock);
 
-			$this->secondFace = $this->getYFace($direction);
-			$secondDirection = $this->getYLength($direction);
-			$secondPosition = $this->getYPosition($direction, $startClone, $startBlock);
+                        $this->secondFace = $this->getXFace($direction);
+                        $secondDirection = $this->getXLength($direction);
+                        $secondPosition = $this->getXPosition($direction, $startClone, $startBlock);
 
-			$this->thirdFace = $this->getZFace($direction);
-			$thirdDirection = $this->getZLength($direction);
-			$thirdPosition = $this->getZPosition($direction, $startClone, $startBlock);
-		}
-		if($this->getYLength($direction) > $mainDirection){
-			$this->mainFace = $this->getYFace($direction);
-			$mainDirection = $this->getYLength($direction);
-			$mainPosition = $this->getYPosition($direction, $startClone, $startBlock);
+                        $this->thirdFace = $this->getYFace($direction);
+                        $thirdDirection = $this->getYLength($direction);
+                        $thirdPosition = $this->getYPosition($direction, $startClone, $startBlock);
+                }
 
-			$this->secondFace = $this->getZFace($direction);
-			$secondDirection = $this->getZLength($direction);
-			$secondPosition = $this->getZPosition($direction, $startClone, $startBlock);
+                $d = $mainPosition / $mainDirection;
+                $secondd = $secondPosition - $secondDirection * $d;
+                $thirdd = $thirdPosition - $thirdDirection * $d;
 
-			$this->thirdFace = $this->getXFace($direction);
-			$thirdDirection = $this->getXLength($direction);
-			$thirdPosition = $this->getXPosition($direction, $startClone, $startBlock);
-		}
-		if($this->getZLength($direction) > $mainDirection){
-			$this->mainFace = $this->getZFace($direction);
-			$mainDirection = $this->getZLength($direction);
-			$mainPosition = $this->getZPosition($direction, $startClone, $startBlock);
+                $this->secondError = floor($secondd * self::$gridSize);
+                $this->secondStep = round($secondDirection / $mainDirection * self::$gridSize);
+                $this->thirdError = floor($thirdd * self::$gridSize);
+                $this->thirdStep = round($thirdDirection / $mainDirection * self::$gridSize);
 
-			$this->secondFace = $this->getXFace($direction);
-			$secondDirection = $this->getXLength($direction);
-			$secondPosition = $this->getXPosition($direction, $startClone, $startBlock);
+                if($this->secondError + $this->secondStep <= 0) {
+                        $this->secondError = -$this->secondStep + 1;
+                }
 
-			$this->thirdFace = $this->getYFace($direction);
-			$thirdDirection = $this->getYLength($direction);
-			$thirdPosition = $this->getYPosition($direction, $startClone, $startBlock);
-		}
+                if($this->thirdError + $this->thirdStep <= 0) {
+                        $this->thirdError = -$this->thirdStep + 1;
+                }
 
-		$d = $mainPosition / $mainDirection;
-		$secondd = $secondPosition - $secondDirection * $d;
-		$thirdd = $thirdPosition - $thirdDirection * $d;
+                $lastBlock = $startBlock->getSide(Vector3::getOppositeSide($this->mainFace));
 
-		$this->secondError = floor($secondd * self::$gridSize);
-		$this->secondStep = round($secondDirection / $mainDirection * self::$gridSize);
-		$this->thirdError = floor($thirdd * self::$gridSize);
-		$this->thirdStep = round($thirdDirection / $mainDirection * self::$gridSize);
+                if($this->secondError < 0) {
+                        $this->secondError += self::$gridSize;
+                        $lastBlock = $lastBlock->getSide(Vector3::getOppositeSide($this->secondFace));
+                }
 
-		if($this->secondError + $this->secondStep <= 0){
-			$this->secondError = -$this->secondStep + 1;
-		}
+                if($this->thirdError < 0) {
+                        $this->thirdError += self::$gridSize;
+                        $lastBlock = $lastBlock->getSide(Vector3::getOppositeSide($this->thirdFace));
+                }
 
-		if($this->thirdError + $this->thirdStep <= 0){
-			$this->thirdError = -$this->thirdStep + 1;
-		}
+                $this->secondError -= self::$gridSize;
+                $this->thirdError -= self::$gridSize;
 
-		$lastBlock = $startBlock->getSide(Vector3::getOppositeSide($this->mainFace));
+                $this->blockQueue[0] = $lastBlock;
 
-		if($this->secondError < 0){
-			$this->secondError += self::$gridSize;
-			$lastBlock = $lastBlock->getSide(Vector3::getOppositeSide($this->secondFace));
-		}
+                $this->currentBlock = -1;
 
-		if($this->thirdError < 0){
-			$this->thirdError += self::$gridSize;
-			$lastBlock = $lastBlock->getSide(Vector3::getOppositeSide($this->thirdFace));
-		}
+                $this->scan();
 
-		$this->secondError -= self::$gridSize;
-		$this->thirdError -= self::$gridSize;
+                $startBlockFound = false;
 
-		$this->blockQueue[0] = $lastBlock;
+                for($cnt = $this->currentBlock; $cnt >= 0; --$cnt) {
+                        if($this->blockEquals($this->blockQueue[$cnt], $startBlock)) {
+                                $this->currentBlock = $cnt;
+                                $startBlockFound = true;
+                                break;
+                        }
+                }
 
-		$this->currentBlock = -1;
+                if(!$startBlockFound) {
+                        throw new \InvalidStateException("Start block missed in BlockIterator");
+                }
 
-		$this->scan();
+                $this->maxDistanceInt = round($maxDistance / (sqrt($mainDirection ** 2 + $secondDirection ** 2 + $thirdDirection ** 2) / $mainDirection));
+        }
 
-		$startBlockFound = false;
+        private function blockEquals(Block $a, Block $b) {
+                return $a->x === $b->x and $a->y === $b->y and $a->z === $b->z;
+        }
 
-		for($cnt = $this->currentBlock; $cnt >= 0; --$cnt){
-			if($this->blockEquals($this->blockQueue[$cnt], $startBlock)){
-				$this->currentBlock = $cnt;
-				$startBlockFound = true;
-				break;
-			}
-		}
+        private function getXFace(Vector3 $direction) {
+                return (($direction->x) > 0) ? Vector3::SIDE_EAST : Vector3::SIDE_WEST;
+        }
 
-		if(!$startBlockFound){
-			throw new \InvalidStateException("Start block missed in BlockIterator");
-		}
+        private function getYFace(Vector3 $direction) {
+                return (($direction->y) > 0) ? Vector3::SIDE_UP : Vector3::SIDE_DOWN;
+        }
 
-		$this->maxDistanceInt = round($maxDistance / (sqrt($mainDirection ** 2 + $secondDirection ** 2 + $thirdDirection ** 2) / $mainDirection));
-	}
+        private function getZFace(Vector3 $direction) {
+                return (($direction->z) > 0) ? Vector3::SIDE_SOUTH : Vector3::SIDE_NORTH;
+        }
 
-	private function blockEquals(Block $a, Block $b){
-		return $a->x === $b->x and $a->y === $b->y and $a->z === $b->z;
-	}
+        private function getXLength(Vector3 $direction) {
+                return abs($direction->x);
+        }
 
-	private function getXFace(Vector3 $direction){
-		return (($direction->x) > 0) ? Vector3::SIDE_EAST : Vector3::SIDE_WEST;
-	}
+        private function getYLength(Vector3 $direction) {
+                return abs($direction->y);
+        }
 
-	private function getYFace(Vector3 $direction){
-		return (($direction->y) > 0) ? Vector3::SIDE_UP : Vector3::SIDE_DOWN;
-	}
+        private function getZLength(Vector3 $direction) {
+                return abs($direction->z);
+        }
 
-	private function getZFace(Vector3 $direction){
-		return (($direction->z) > 0) ? Vector3::SIDE_SOUTH : Vector3::SIDE_NORTH;
-	}
+        private function getPosition($direction, $position, $blockPosition) {
+                return $direction > 0 ? ($position - $blockPosition) : ($blockPosition + 1 - $position);
+        }
 
-	private function getXLength(Vector3 $direction){
-		return abs($direction->x);
-	}
+        private function getXPosition(Vector3 $direction, Vector3 $position, Block $block) {
+                return $this->getPosition($direction->x, $position->x, $block->x);
+        }
 
-	private function getYLength(Vector3 $direction){
-		return abs($direction->y);
-	}
+        private function getYPosition(Vector3 $direction, Vector3 $position, Block $block) {
+                return $this->getPosition($direction->y, $position->y, $block->y);
+        }
 
-	private function getZLength(Vector3 $direction){
-		return abs($direction->z);
-	}
+        private function getZPosition(Vector3 $direction, Vector3 $position, Block $block) {
+                return $this->getPosition($direction->z, $position->z, $block->z);
+        }
 
-	private function getPosition($direction, $position, $blockPosition){
-		return $direction > 0 ? ($position - $blockPosition) : ($blockPosition + 1 - $position);
-	}
+        public function next() {
+                $this->scan();
 
-	private function getXPosition(Vector3 $direction, Vector3 $position, Block $block){
-		return $this->getPosition($direction->x, $position->x, $block->x);
-	}
+                if($this->currentBlock <= -1) {
+                        throw new \OutOfBoundsException;
+                } else {
+                        $this->currentBlockObject = $this->blockQueue[$this->currentBlock--];
+                }
+        }
 
-	private function getYPosition(Vector3 $direction, Vector3 $position, Block $block){
-		return $this->getPosition($direction->y, $position->y, $block->y);
-	}
+        /**
+         * @return Block
+         *
+         * @throws \OutOfBoundsException
+         */
+        public function current() {
+                if($this->currentBlockObject === null) {
+                        throw new \OutOfBoundsException;
+                }
+                return $this->currentBlockObject;
+        }
 
-	private function getZPosition(Vector3 $direction, Vector3 $position, Block $block){
-		return $this->getPosition($direction->z, $position->z, $block->z);
-	}
+        public function rewind() {
+                throw new \InvalidStateException("BlockIterator doesn't support rewind()");
+        }
 
-	public function next(){
-		$this->scan();
+        public function key() {
+                return $this->currentBlock - 1;
+        }
 
-		if($this->currentBlock <= -1){
-			throw new \OutOfBoundsException;
-		}else{
-			$this->currentBlockObject = $this->blockQueue[$this->currentBlock--];
-		}
-	}
+        public function valid() {
+                $this->scan();
+                return $this->currentBlock !== -1;
+        }
 
-	/**
-	 * @return Block
-	 *
-	 * @throws \OutOfBoundsException
-	 */
-	public function current(){
-		if($this->currentBlockObject === null){
-			throw new \OutOfBoundsException;
-		}
-		return $this->currentBlockObject;
-	}
+        private function scan() {
+                if($this->currentBlock >= 0) {
+                        return;
+                }
 
-	public function rewind(){
-		throw new \InvalidStateException("BlockIterator doesn't support rewind()");
-	}
+                if($this->maxDistance !== 0 and $this->currentDistance > $this->maxDistanceInt) {
+                        $this->end = true;
+                        return;
+                }
 
-	public function key(){
-		return $this->currentBlock - 1;
-	}
+                if($this->end) {
+                        return;
+                }
 
-	public function valid(){
-		$this->scan();
-		return $this->currentBlock !== -1;
-	}
+                ++$this->currentDistance;
 
-	private function scan(){
-		if($this->currentBlock >= 0){
-			return;
-		}
+                $this->secondError += $this->secondStep;
+                $this->thirdError += $this->thirdStep;
 
-		if($this->maxDistance !== 0 and $this->currentDistance > $this->maxDistanceInt){
-			$this->end = true;
-			return;
-		}
+                if($this->secondError > 0 and $this->thirdError > 0) {
+                        $this->blockQueue[2] = $this->blockQueue[0]->getSide($this->mainFace);
 
-		if($this->end){
-			return;
-		}
+                        if(($this->secondStep * $this->thirdError) < ($this->thirdStep * $this->secondError)) {
+                                $this->blockQueue[1] = $this->blockQueue[2]->getSide($this->secondFace);
+                                $this->blockQueue[0] = $this->blockQueue[1]->getSide($this->thirdFace);
+                        } else {
+                                $this->blockQueue[1] = $this->blockQueue[2]->getSide($this->thirdFace);
+                                $this->blockQueue[0] = $this->blockQueue[1]->getSide($this->secondFace);
+                        }
 
-		++$this->currentDistance;
+                        $this->thirdError -= self::$gridSize;
+                        $this->secondError -= self::$gridSize;
+                        $this->currentBlock = 2;
+                } elseif($this->secondError > 0) {
+                        $this->blockQueue[1] = $this->blockQueue[0]->getSide($this->mainFace);
+                        $this->blockQueue[0] = $this->blockQueue[1]->getSide($this->secondFace);
+                        $this->secondError -= self::$gridSize;
+                        $this->currentBlock = 1;
+                } elseif($this->thirdError > 0) {
+                        $this->blockQueue[1] = $this->blockQueue[0]->getSide($this->mainFace);
+                        $this->blockQueue[0] = $this->blockQueue[1]->getSide($this->thirdFace);
+                        $this->thirdError -= self::$gridSize;
+                        $this->currentBlock = 1;
+                } else {
+                        $this->blockQueue[0] = $this->blockQueue[0]->getSide($this->mainFace);
+                        $this->currentBlock = 0;
+                }
+        }
 
-		$this->secondError += $this->secondStep;
-		$this->thirdError += $this->thirdStep;
-
-		if($this->secondError > 0 and $this->thirdError > 0){
-			$this->blockQueue[2] = $this->blockQueue[0]->getSide($this->mainFace);
-
-			if(($this->secondStep * $this->thirdError) < ($this->thirdStep * $this->secondError)){
-				$this->blockQueue[1] = $this->blockQueue[2]->getSide($this->secondFace);
-				$this->blockQueue[0] = $this->blockQueue[1]->getSide($this->thirdFace);
-			}else{
-				$this->blockQueue[1] = $this->blockQueue[2]->getSide($this->thirdFace);
-				$this->blockQueue[0] = $this->blockQueue[1]->getSide($this->secondFace);
-			}
-
-			$this->thirdError -= self::$gridSize;
-			$this->secondError -= self::$gridSize;
-			$this->currentBlock = 2;
-		}elseif($this->secondError > 0){
-			$this->blockQueue[1] = $this->blockQueue[0]->getSide($this->mainFace);
-			$this->blockQueue[0] = $this->blockQueue[1]->getSide($this->secondFace);
-			$this->secondError -= self::$gridSize;
-			$this->currentBlock = 1;
-		}elseif($this->thirdError > 0){
-			$this->blockQueue[1] = $this->blockQueue[0]->getSide($this->mainFace);
-			$this->blockQueue[0] = $this->blockQueue[1]->getSide($this->thirdFace);
-			$this->thirdError -= self::$gridSize;
-			$this->currentBlock = 1;
-		}else{
-			$this->blockQueue[0] = $this->blockQueue[0]->getSide($this->mainFace);
-			$this->currentBlock = 0;
-		}
-	}
 }

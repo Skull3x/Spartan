@@ -228,6 +228,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
         /** @var PermissibleBase */
         private $perm = null;
+        public $lastSnowball = 0;
 
         public function getLeaveMessage() {
                 return new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.left", [
@@ -1385,11 +1386,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                 if($this->inAirTicks >= $time) {
                         $this->kick("Please disable flying mods to play.", false);
                 }
-                //Max blocks a player can move per movement
-                $blocks = 1.4;
-                if(round($from->distance($to), 5) > $blocks) {
-                        $this->kick("Please disable speed mods to play.", false);
-                }
         }
 
         public function setMotion(Vector3 $mot) {
@@ -1507,10 +1503,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                 $dot = $dV->dot(new Vector2($this->x, $this->z));
                 $dot1 = $dV->dot(new Vector2($pos->x, $pos->z));
                 return ($dot1 - $dot) >= -$maxDiff;
-        }
-
-        public function inRange(Vector3 $pos) {
-                return round($this->distance($pos), 5) < 4.5;
         }
 
         public function onPlayerPreLogin() {
@@ -1967,10 +1959,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                                 $blockVector = new Vector3($packet->x, $packet->y, $packet->z);
 
-                                if(!$this->inRange($blockVector)) {
-                                        $this->kick("Please disable reach hacks to play.", false);
-                                }
-
                                 $this->craftingType = 0;
 
                                 if($packet->face >= 0 and $packet->face <= 5) { //Use Block, place
@@ -2011,9 +1999,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 } elseif($packet->face === 0xff) {
                                         $aimPos = (new Vector3($packet->x / 32768, $packet->y / 32768, $packet->z / 32768))->normalize();
 
-                                        if($this->isCreative()) {
-                                                $item = $this->inventory->getItemInHand();
-                                        } elseif(!$this->inventory->getItemInHand()->deepEquals($packet->item)) {
+                                        if(($this->ticksLived - $this->lastSnowball) <= 10) {
+                                                $this->inventory->sendHeldItem($this);
+                                                break;
+                                        }
+                                        $this->lastSnowball = $this->ticksLived;
+
+                                        if(!$this->inventory->getItemInHand()->deepEquals($packet->item)) {
                                                 $this->inventory->sendHeldItem($this);
                                                 break;
                                         } else {
@@ -2037,9 +2029,12 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                                         new Double("", $this->z)
                                                             ]),
                                                     "Motion" => new Enum("Motion", [
-                                                        new Double("", $aimPos->x),
-                                                        new Double("", $aimPos->y),
-                                                        new Double("", $aimPos->z)
+                                                        /* new Double("", $aimPos->x),
+                                                          new Double("", $aimPos->y),
+                                                          new Double("", $aimPos->z) */
+                                                        new Double("", -sin($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI)),
+                                                        new Double("", -sin($this->pitch / 180 * M_PI)),
+                                                        new Double("", cos($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI))
                                                             ]),
                                                     "Rotation" => new Enum("Rotation", [
                                                         new Float("", $this->yaw),
@@ -2047,7 +2042,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                                             ]),
                                                 ]);
 
-                                                $f = 1.5;
+                                                $f = 0.8;
                                                 $snowball = Entity::createEntity("Snowball", $this->chunk, $nbt, $this);
                                                 $snowball->setMotion($snowball->getMotion()->multiply($f));
                                                 if($this->isSurvival()) {
@@ -2078,10 +2073,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                                 $packet->eid = $this->id;
                                 $pos = new Vector3($packet->x, $packet->y, $packet->z);
-
-                                if(!$this->inRange($pos)) {
-                                        $this->kick("Please disable reach hacks to play.", false);
-                                }
 
                                 switch ($packet->action) {
                                         case PlayerActionPacket::ACTION_START_BREAK:
@@ -2328,10 +2319,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                                 $target = $this->level->getEntity($packet->target);
 
-                                if(!$this->inRange($target)) {
-                                        $this->kick("Please disable reach hacks to play.", false);
-                                }
-
                                 $cancelled = false;
 
                                 if(
@@ -2539,34 +2526,172 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 }
                                 break;
 
+                        case ProtocolInfo::CONTAINER_CLOSE_PACKET:
+                                if($this->spawned === false or $packet->windowid === 0) {
+                                        break;
+                                }
+                                $this->craftingType = 0;
+                                $this->currentTransaction = null;
+                                if(isset($this->windowIndex[$packet->windowid])) {
+                                        $this->server->getPluginManager()->callEvent(new InventoryCloseEvent($this->windowIndex[$packet->windowid], $this));
+                                        $this->removeWindow($this->windowIndex[$packet->windowid]);
+                                } else {
+                                        unset($this->windowIndex[$packet->windowid]);
+                                }
+                                break;
+
                         case ProtocolInfo::CRAFTING_EVENT_PACKET:
-//                                if ($this->spawned === false or ! $this->isAlive()) {
-//                                        break;
-//                                } elseif (!isset($this->windowIndex[$packet->windowId])) {
-                                $this->inventory->sendContents($this);
-                                $pk = new ContainerClosePacket();
-                                $pk->windowid = $packet->windowId;
-                                $this->dataPacket($pk);
-//                                        break;
-//                                }
-//
-//                                $recipe = $this->server->getCraftingManager()->getRecipe($packet->id);
-//
-//                                if($recipe instanceof Recipe) {
-//                                        foreach($recipe->getIngredientList() as $ingredient) {
-//                                                if($this->inventory->contains($ingredient)) {
-//                                                        continue;
-//                                                } else {
-//                                                        $this->inventory->sendContents($this);
-//                                                        $pk = new ContainerClosePacket();
-//                                                        $pk->windowid = $packet->windowId;
-//                                                        $this->dataPacket($pk);
-//                                                        break;
-//                                                }
-//                                        }
-//                                        $this->inventory->addItem($recipe->getResult());
-//                                }
-//                                
+                                if($this->spawned === false or ! $this->isAlive()) {
+                                        break;
+                                } elseif(!isset($this->windowIndex[$packet->windowId])) {
+                                        $this->inventory->sendContents($this);
+                                        $pk = new ContainerClosePacket();
+                                        $pk->windowid = $packet->windowId;
+                                        $this->dataPacket($pk);
+                                        break;
+                                }
+
+                                $recipe = $this->server->getCraftingManager()->getRecipe($packet->id);
+
+
+                                if($recipe === null or ( ($recipe instanceof BigShapelessRecipe or $recipe instanceof BigShapedRecipe) and $this->craftingType === 0)) {
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
+
+                                /** @var Item $item */
+                                foreach($packet->input as $i => $item) {
+                                        if($item->getDamage() === -1 or $item->getDamage() === 0xffff) {
+                                                $item->setDamage(null);
+                                        }
+
+                                        if($i < 9 and $item->getId() > 0) {
+                                                $item->setCount(1);
+                                        }
+                                }
+
+                                $canCraft = true;
+
+
+                                if($recipe instanceof ShapedRecipe) {
+                                        for($x = 0; $x < 3 and $canCraft; ++$x) {
+                                                for($y = 0; $y < 3; ++$y) {
+                                                        $item = $packet->input[$y * 3 + $x];
+                                                        $ingredient = $recipe->getIngredient($x, $y);
+                                                        if($item->getCount() > 0 and $item->getId() > 0) {
+                                                                if($ingredient == null) {
+                                                                        $canCraft = false;
+                                                                        break;
+                                                                }
+                                                                if($ingredient->getId() != 0 and ! $ingredient->deepEquals($item, $ingredient->getDamage() !== null, $ingredient->getCompoundTag() !== null)) {
+                                                                        $canCraft = false;
+                                                                        break;
+                                                                }
+                                                        } elseif($ingredient !== null and $item->getId() !== 0) {
+                                                                $canCraft = false;
+                                                                break;
+                                                        }
+                                                }
+                                        }
+                                } elseif($recipe instanceof ShapelessRecipe) {
+                                        $needed = $recipe->getIngredientList();
+
+                                        for($x = 0; $x < 3 and $canCraft; ++$x) {
+                                                for($y = 0; $y < 3; ++$y) {
+                                                        $item = clone $packet->input[$y * 3 + $x];
+
+                                                        foreach($needed as $k => $n) {
+                                                                if($n->deepEquals($item, $n->getDamage() !== null, $n->getCompoundTag() !== null)) {
+                                                                        $remove = min($n->getCount(), $item->getCount());
+                                                                        $n->setCount($n->getCount() - $remove);
+                                                                        $item->setCount($item->getCount() - $remove);
+
+                                                                        if($n->getCount() === 0) {
+                                                                                unset($needed[$k]);
+                                                                        }
+                                                                }
+                                                        }
+
+                                                        if($item->getCount() > 0) {
+                                                                $canCraft = false;
+                                                                break;
+                                                        }
+                                                }
+                                        }
+
+                                        if(count($needed) > 0) {
+                                                $canCraft = false;
+                                        }
+                                } else {
+                                        $canCraft = false;
+                                }
+
+                                /** @var Item[] $ingredients */
+                                $canCraft = true; //0.13.1大量物品本地配方出现问题,无法解决,使用极端(唯一)方法修复.
+                                $ingredients = $packet->input;
+                                $result = $packet->output[0];
+
+                                if(!$canCraft or ! $recipe->getResult()->deepEquals($result)) {
+                                        $this->server->getLogger()->debug("Unmatched recipe " . $recipe->getId() . " from player " . $this->getName() . ": expected " . $recipe->getResult() . ", got " . $result . ", using: " . implode(", ", $ingredients));
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
+
+                                $used = array_fill(0, $this->inventory->getSize(), 0);
+
+                                foreach($ingredients as $ingredient) {
+                                        $slot = -1;
+                                        foreach($this->inventory->getContents() as $index => $i) {
+                                                if($ingredient->getId() !== 0 and $ingredient->deepEquals($i, $ingredient->getDamage() !== null) and ( $i->getCount() - $used[$index]) >= 1) {
+                                                        $slot = $index;
+                                                        $used[$index] ++;
+                                                        break;
+                                                }
+                                        }
+
+                                        if($ingredient->getId() !== 0 and $slot === -1) {
+                                                $canCraft = false;
+                                                break;
+                                        }
+                                }
+
+                                if(!$canCraft) {
+                                        $this->server->getLogger()->debug("Unmatched recipe " . $recipe->getId() . " from player " . $this->getName() . ": client does not have enough items, using: " . implode(", ", $ingredients));
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
+
+                                $this->server->getPluginManager()->callEvent($ev = new CraftItemEvent($this, $ingredients, $recipe));
+
+                                if($ev->isCancelled()) {
+                                        $this->inventory->sendContents($this);
+                                        break;
+                                }
+
+                                foreach($used as $slot => $count) {
+                                        if($count === 0) {
+                                                continue;
+                                        }
+
+                                        $item = $this->inventory->getItem($slot);
+
+                                        if($item->getCount() > $count) {
+                                                $newItem = clone $item;
+                                                $newItem->setCount($item->getCount() - $count);
+                                        } else {
+                                                $newItem = Item::get(Item::AIR, 0, 0);
+                                        }
+
+                                        $this->inventory->setItem($slot, $newItem);
+                                }
+
+                                $extraItem = $this->inventory->addItem($recipe->getResult());
+                                if(count($extraItem) > 0) {
+                                        foreach($extraItem as $item) {
+                                                $this->level->dropItem($this, $item);
+                                        }
+                                }
+
                                 break;
 
                         case ProtocolInfo::CONTAINER_SET_SLOT_PACKET:

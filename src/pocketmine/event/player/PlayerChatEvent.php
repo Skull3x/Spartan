@@ -28,77 +28,79 @@ use pocketmine\Server;
 /**
  * Called when a player chats something
  */
-class PlayerChatEvent extends PlayerEvent implements Cancellable{
-	public static $handlerList = null;
+class PlayerChatEvent extends PlayerEvent implements Cancellable {
 
-	/** @var string */
-	protected $message;
+        public static $handlerList = null;
 
-	/** @var string */
-	protected $format;
+        /** @var string */
+        protected $message;
 
-	/**
-	 * @var Player[]
-	 */
-	protected $recipients = [];
+        /** @var string */
+        protected $format;
 
-	public function __construct(Player $player, $message, $format = "chat.type.text", array $recipients = null){
-		$this->player = $player;
-		$this->message = $message;
+        /**
+         * @var Player[]
+         */
+        protected $recipients = [];
 
-		//TODO: @deprecated (backwards-compativility)
-		$i = 0;
-		while(($pos = strpos($format, "%s")) !== false){
-			$format = substr($format, 0, $pos) . "{%$i}" . substr($format, $pos + 2);
-			++$i;
-		}
+        public function __construct(Player $player, $message, $format = "chat.type.text", array $recipients = null) {
+                $this->player = $player;
+                $this->message = $message;
 
-		$this->format = $format;
+                //TODO: @deprecated (backwards-compativility)
+                $i = 0;
+                while (($pos = strpos($format, "%s")) !== false) {
+                        $format = substr($format, 0, $pos) . "{%$i}" . substr($format, $pos + 2);
+                        ++$i;
+                }
 
-		if($recipients === null){
-			$this->recipients = Server::getInstance()->getPluginManager()->getPermissionSubscriptions(Server::BROADCAST_CHANNEL_USERS);
-		}else{
-			$this->recipients = $recipients;
-		}
-	}
+                $this->format = $format;
 
-	public function getMessage(){
-		return $this->message;
-	}
+                if($recipients === null) {
+                        $this->recipients = Server::getInstance()->getPluginManager()->getPermissionSubscriptions(Server::BROADCAST_CHANNEL_USERS);
+                } else {
+                        $this->recipients = $recipients;
+                }
+        }
 
-	public function setMessage($message){
-		$this->message = $message;
-	}
+        public function getMessage() {
+                return $this->message;
+        }
 
-	/**
-	 * Changes the player that is sending the message
-	 *
-	 * @param Player $player
-	 */
-	public function setPlayer(Player $player){
-		$this->player = $player;
-	}
+        public function setMessage($message) {
+                $this->message = $message;
+        }
 
-	public function getFormat(){
-		return $this->format;
-	}
+        /**
+         * Changes the player that is sending the message
+         *
+         * @param Player $player
+         */
+        public function setPlayer(Player $player) {
+                $this->player = $player;
+        }
 
-	public function setFormat($format){
-		//TODO: @deprecated (backwards-compativility)
-		$i = 0;
-		while(($pos = strpos($format, "%s")) !== false){
-			$format = substr($format, 0, $pos) . "{%$i}" . substr($format, $pos + 2);
-			++$i;
-		}
+        public function getFormat() {
+                return $this->format;
+        }
 
-		$this->format = $format;
-	}
+        public function setFormat($format) {
+                //TODO: @deprecated (backwards-compativility)
+                $i = 0;
+                while (($pos = strpos($format, "%s")) !== false) {
+                        $format = substr($format, 0, $pos) . "{%$i}" . substr($format, $pos + 2);
+                        ++$i;
+                }
 
-	public function getRecipients(){
-		return $this->recipients;
-	}
+                $this->format = $format;
+        }
 
-	public function setRecipients(array $recipients){
-		$this->recipients = $recipients;
-	}
+        public function getRecipients() {
+                return $this->recipients;
+        }
+
+        public function setRecipients(array $recipients) {
+                $this->recipients = $recipients;
+        }
+
 }

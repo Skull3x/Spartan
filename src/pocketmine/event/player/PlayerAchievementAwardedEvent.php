@@ -27,22 +27,24 @@ use pocketmine\Player;
 /**
  * Called when a player is awarded an achievement
  */
-class PlayerAchievementAwardedEvent extends PlayerEvent implements Cancellable{
-	public static $handlerList = null;
+class PlayerAchievementAwardedEvent extends PlayerEvent implements Cancellable {
 
-	/** @var string */
-	protected $achievement;
+        public static $handlerList = null;
 
-	/**
-	 * @param Player $player
-	 * @param string $achievementId
-	 */
-	public function __construct(Player $player, $achievementId){
-		$this->player = $player;
-		$this->achievement = $achievementId;
-	}
+        /** @var string */
+        protected $achievement;
 
-	public function getAchievement(){
-		return $this->achievement;
-	}
+        /**
+         * @param Player $player
+         * @param string $achievementId
+         */
+        public function __construct(Player $player, $achievementId) {
+                $this->player = $player;
+                $this->achievement = $achievementId;
+        }
+
+        public function getAchievement() {
+                return $this->achievement;
+        }
+
 }

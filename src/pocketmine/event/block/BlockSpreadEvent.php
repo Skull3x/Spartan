@@ -24,22 +24,23 @@ namespace pocketmine\event\block;
 use pocketmine\block\Block;
 use pocketmine\event\Cancellable;
 
-class BlockSpreadEvent extends BlockFormEvent implements Cancellable{
-	public static $handlerList = null;
+class BlockSpreadEvent extends BlockFormEvent implements Cancellable {
 
-	/** @var Block */
-	private $source;
+        public static $handlerList = null;
 
-	public function __construct(Block $block, Block $source, Block $newState){
-		parent::__construct($block, $newState);
-		$this->source = $source;
-	}
+        /** @var Block */
+        private $source;
 
-	/**
-	 * @return Block
-	 */
-	public function getSource(){
-		return $this->source;
-	}
+        public function __construct(Block $block, Block $source, Block $newState) {
+                parent::__construct($block, $newState);
+                $this->source = $source;
+        }
+
+        /**
+         * @return Block
+         */
+        public function getSource() {
+                return $this->source;
+        }
 
 }
