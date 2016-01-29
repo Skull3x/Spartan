@@ -17,21 +17,19 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\command;
 
+interface CommandExecutor {
 
-interface CommandExecutor{
-
-	/**
-	 * @param CommandSender $sender
-	 * @param Command       $command
-	 * @param string        $label
-	 * @param string[]      $args
-	 *
-	 * @return boolean
-	 */
-	public function onCommand(CommandSender $sender, Command $command, $label, array $args);
-
+        /**
+         * @param CommandSender $sender
+         * @param Command       $command
+         * @param string        $label
+         * @param string[]      $args
+         *
+         * @return boolean
+         */
+        public function onCommand(CommandSender $sender, Command $command, $label, array $args);
 }

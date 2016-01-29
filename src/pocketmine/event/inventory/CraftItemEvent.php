@@ -27,51 +27,54 @@ use pocketmine\inventory\Recipe;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-class CraftItemEvent extends Event implements Cancellable{
-	public static $handlerList = null;
+class CraftItemEvent extends Event implements Cancellable {
 
-	/** @var Item[] */
-	private $input = [];
-	/** @var Recipe */
-	private $recipe;
-	/** @var \pocketmine\Player */
-	private $player;
+        public static $handlerList = null;
 
+        /** @var Item[] */
+        private $input = [];
 
-	/**
-	 * @param \pocketmine\Player $player
-	 * @param Item[] $input
-	 * @param Recipe $recipe
-	 */
-	public function __construct(Player $player, array $input, Recipe $recipe){
-		$this->player = $player;
-		$this->input = $input;
-		$this->recipe = $recipe;
-	}
+        /** @var Recipe */
+        private $recipe;
 
-	/**
-	 * @return Item[]
-	 */
-	public function getInput(){
-		$items = [];
-		foreach($items as $i => $item){
-			$items[$i] = clone $item;
-		}
+        /** @var \pocketmine\Player */
+        private $player;
 
-		return $items;
-	}
+        /**
+         * @param \pocketmine\Player $player
+         * @param Item[] $input
+         * @param Recipe $recipe
+         */
+        public function __construct(Player $player, array $input, Recipe $recipe) {
+                $this->player = $player;
+                $this->input = $input;
+                $this->recipe = $recipe;
+        }
 
-	/**
-	 * @return Recipe
-	 */
-	public function getRecipe(){
-		return $this->recipe;
-	}
+        /**
+         * @return Item[]
+         */
+        public function getInput() {
+                $items = [];
+                foreach($items as $i => $item) {
+                        $items[$i] = clone $item;
+                }
 
-	/**
-	 * @return \pocktemine\Player
-	 */
-	public function getPlayer(){
-		return $this->player;
-	}
+                return $items;
+        }
+
+        /**
+         * @return Recipe
+         */
+        public function getRecipe() {
+                return $this->recipe;
+        }
+
+        /**
+         * @return \pocktemine\Player
+         */
+        public function getPlayer() {
+                return $this->player;
+        }
+
 }

@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Sheep extends Animal implements Colorable{
-
+class Sheep extends Animal implements Colorable {
+        
 }

@@ -17,42 +17,38 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
-class UpdateAttributesPacket extends DataPacket{
-        
-	const NETWORK_ID = Info::UPDATE_ATTRIBUTES_PACKET;
-        
+class UpdateAttributesPacket extends DataPacket {
+
+        const NETWORK_ID = Info::UPDATE_ATTRIBUTES_PACKET;
         const HEALTH = "generic.health";
         const HUNGER = "player.hunger";
         const EXPERIENCE = "player.experience";
         const EXPERIENCE_LEVEL = "player.level";
-        
+
         public $entityId;
-    
         public $minValue;
-    
         public $maxValue;
-    
         public $value;
-    
         public $name;
-    
-	public function decode(){
+
+        public function decode() {
                 
-	}
-        
-	public function encode(){
-		$this->reset();
-		$this->putLong($this->entityId);
-		$this->putShort(1);
+        }
+
+        public function encode() {
+                $this->reset();
+                $this->putLong($this->entityId);
+                $this->putShort(1);
                 $this->putFloat($this->minValue);
                 $this->putFloat($this->maxValue);
                 $this->putFloat($this->value);
                 $this->putString($this->name);
-	}
+        }
+
 }

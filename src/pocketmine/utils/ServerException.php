@@ -17,10 +17,10 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\utils;
 
-class ServerException extends \RuntimeException{
-
+class ServerException extends \RuntimeException {
+        
 }

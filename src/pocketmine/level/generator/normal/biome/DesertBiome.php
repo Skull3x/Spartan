@@ -17,23 +17,22 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\level\generator\normal\biome;
 
+class DesertBiome extends SandyBiome {
 
+        public function __construct() {
+                parent::__construct();
+                $this->setElevation(63, 74);
 
-class DesertBiome extends SandyBiome{
+                $this->temperature = 2;
+                $this->rainfall = 0;
+        }
 
-	public function __construct(){
-		parent::__construct();
-		$this->setElevation(63, 74);
+        public function getName() {
+                return "Desert";
+        }
 
-		$this->temperature = 2;
-		$this->rainfall = 0;
-	}
-
-	public function getName(){
-		return "Desert";
-	}
 }

@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\network\protocol;
 
@@ -25,28 +25,30 @@ namespace pocketmine\network\protocol;
 
 use pocketmine\item\Item;
 
-class ContainerSetSlotPacket extends DataPacket{
-	const NETWORK_ID = Info::CONTAINER_SET_SLOT_PACKET;
+class ContainerSetSlotPacket extends DataPacket {
 
-	public $windowid;
-	public $slot;
-	public $hotbarSlot;
-	/** @var Item */
-	public $item;
+        const NETWORK_ID = Info::CONTAINER_SET_SLOT_PACKET;
 
-	public function decode(){
-		$this->windowid = $this->getByte();
-		$this->slot = $this->getShort();
-		$this->hotboarSlot = $this->getShort();
-		$this->item = $this->getSlot();
-	}
+        public $windowid;
+        public $slot;
+        public $hotbarSlot;
 
-	public function encode(){
-		$this->reset();
-		$this->putByte($this->windowid);
-		$this->putShort($this->slot);
-		$this->putShort($this->hotbarSlot);
-		$this->putSlot($this->item);
-	}
+        /** @var Item */
+        public $item;
+
+        public function decode() {
+                $this->windowid = $this->getByte();
+                $this->slot = $this->getShort();
+                $this->hotboarSlot = $this->getShort();
+                $this->item = $this->getSlot();
+        }
+
+        public function encode() {
+                $this->reset();
+                $this->putByte($this->windowid);
+                $this->putShort($this->slot);
+                $this->putShort($this->hotbarSlot);
+                $this->putSlot($this->item);
+        }
 
 }

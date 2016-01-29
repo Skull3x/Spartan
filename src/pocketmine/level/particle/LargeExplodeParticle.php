@@ -17,14 +17,16 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\level\particle;
 
 use pocketmine\math\Vector3;
 
-class LargeExplodeParticle extends GenericParticle{
-	public function __construct(Vector3 $pos){
-		parent::__construct($pos, Particle::TYPE_LARGE_EXPLODE);
-	}
+class LargeExplodeParticle extends GenericParticle {
+
+        public function __construct(Vector3 $pos) {
+                parent::__construct($pos, Particle::TYPE_LARGE_EXPLODE);
+        }
+
 }

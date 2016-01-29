@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-abstract class Creature extends Living{
-
+abstract class Creature extends Living {
+        
 }

@@ -17,11 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-
-class Chicken extends Animal{
-
+class Chicken extends Animal {
+        
 }

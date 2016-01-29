@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____
@@ -16,8 +17,10 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
-namespace pocketmine\inventory;
-class StonecutterShapedRecipe extends ShapedRecipe{
+ */
 
+namespace pocketmine\inventory;
+
+class StonecutterShapedRecipe extends ShapedRecipe {
+        
 }

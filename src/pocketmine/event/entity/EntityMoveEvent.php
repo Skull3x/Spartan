@@ -29,20 +29,20 @@ use pocketmine\math\Vector3;
 /**
  * @deprecated
  */
-class EntityMoveEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityMoveEvent extends EntityEvent implements Cancellable {
 
-	/** @var \pocketmine\math\Vector3 */
-	private $pos;
+        public static $handlerList = null;
 
-	public function __construct(Entity $entity, Vector3 $pos){
-		$this->entity = $entity;
-		$this->pos = $pos;
-	}
+        /** @var \pocketmine\math\Vector3 */
+        private $pos;
 
-	public function getVector(){
-		return $this->pos;
-	}
+        public function __construct(Entity $entity, Vector3 $pos) {
+                $this->entity = $entity;
+                $this->pos = $pos;
+        }
 
+        public function getVector() {
+                return $this->pos;
+        }
 
 }

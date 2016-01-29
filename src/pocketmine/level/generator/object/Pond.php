@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\level\generator\object;
 
@@ -26,19 +26,22 @@ use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3 as Vector3;
 use pocketmine\utils\Random;
 
-class Pond{
-	private $random;
-	public $type;
+class Pond {
 
-	public function __construct(Random $random, Block $type){
-		$this->type = $type;
-		$this->random = $random;
-	}
+        private $random;
+        public $type;
 
-	public function canPlaceObject(ChunkManager $level, Vector3 $pos){
-	}
+        public function __construct(Random $random, Block $type) {
+                $this->type = $type;
+                $this->random = $random;
+        }
 
-	public function placeObject(ChunkManager $level, Vector3 $pos){
-	}
+        public function canPlaceObject(ChunkManager $level, Vector3 $pos) {
+                
+        }
+
+        public function placeObject(ChunkManager $level, Vector3 $pos) {
+                
+        }
 
 }

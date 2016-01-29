@@ -17,14 +17,14 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\item;
 
-class GoldenApple extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::GOLDEN_APPLE, $meta, $count, (($meta == 0 ? "Golden Apple" : "Enchanted Golden Apple")));
-	}
+class GoldenApple extends Item {
+
+        public function __construct($meta = 0, $count = 1) {
+                parent::__construct(self::GOLDEN_APPLE, $meta, $count, (($meta == 0 ? "Golden Apple" : "Enchanted Golden Apple")));
+        }
 
 }
-

@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\item;
 
@@ -32,54 +32,56 @@ use pocketmine\nbt\tag\Float;
 use pocketmine\nbt\tag\String;
 use pocketmine\Player;
 
-class SpawnEgg extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::SPAWN_EGG, $meta, $count, "Spawn Egg");
-	}
+class SpawnEgg extends Item {
 
-	public function canBeActivated(){
-		return true;
-	}
+        public function __construct($meta = 0, $count = 1) {
+                parent::__construct(self::SPAWN_EGG, $meta, $count, "Spawn Egg");
+        }
 
-	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
-		$entity = null;
-		$chunk = $level->getChunk($block->getX() >> 4, $block->getZ() >> 4);
+        public function canBeActivated() {
+                return true;
+        }
 
-		if(!($chunk instanceof FullChunk)){
-			return false;
-		}
+        public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz) {
+                $entity = null;
+                $chunk = $level->getChunk($block->getX() >> 4, $block->getZ() >> 4);
 
-		$nbt = new Compound("", [
-			"Pos" => new Enum("Pos", [
-				new Double("", $block->getX() + 0.5),
-				new Double("", $block->getY()),
-				new Double("", $block->getZ() + 0.5)
-			]),
-			"Motion" => new Enum("Motion", [
-				new Double("", 0),
-				new Double("", 0),
-				new Double("", 0)
-			]),
-			"Rotation" => new Enum("Rotation", [
-				new Float("", lcg_value() * 360),
-				new Float("", 0)
-			]),
-		]);
+                if(!($chunk instanceof FullChunk)) {
+                        return false;
+                }
 
-		if($this->hasCustomName()){
-			$nbt->CustomName = new String("CustomName", $this->getCustomName());
-		}
+                $nbt = new Compound("", [
+                    "Pos" => new Enum("Pos", [
+                        new Double("", $block->getX() + 0.5),
+                        new Double("", $block->getY()),
+                        new Double("", $block->getZ() + 0.5)
+                            ]),
+                    "Motion" => new Enum("Motion", [
+                        new Double("", 0),
+                        new Double("", 0),
+                        new Double("", 0)
+                            ]),
+                    "Rotation" => new Enum("Rotation", [
+                        new Float("", lcg_value() * 360),
+                        new Float("", 0)
+                            ]),
+                ]);
 
-		$entity = Entity::createEntity($this->meta, $chunk, $nbt);
+                if($this->hasCustomName()) {
+                        $nbt->CustomName = new String("CustomName", $this->getCustomName());
+                }
 
-		if($entity instanceof Entity){
-			if($player->isSurvival()){
-				--$this->count;
-			}
-			$entity->spawnToAll();
-			return true;
-		}
+                $entity = Entity::createEntity($this->meta, $chunk, $nbt);
 
-		return false;
-	}
+                if($entity instanceof Entity) {
+                        if($player->isSurvival()) {
+                                --$this->count;
+                        }
+                        $entity->spawnToAll();
+                        return true;
+                }
+
+                return false;
+        }
+
 }

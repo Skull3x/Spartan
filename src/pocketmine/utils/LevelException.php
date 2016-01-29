@@ -17,10 +17,10 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\utils;
 
-class LevelException extends ServerException{
-
+class LevelException extends ServerException {
+        
 }

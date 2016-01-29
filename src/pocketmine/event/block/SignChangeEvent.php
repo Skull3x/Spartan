@@ -28,53 +28,56 @@ use pocketmine\Player;
 /**
  * Called when a sign is changed by a player.
  */
-class SignChangeEvent extends BlockEvent implements Cancellable{
-	public static $handlerList = null;
+class SignChangeEvent extends BlockEvent implements Cancellable {
 
-	/** @var \pocketmine\Player */
-	private $player;
-	/** @var string[] */
-	private $lines = [];
+        public static $handlerList = null;
 
-	/**
-	 * @param Block    $theBlock
-	 * @param Player   $thePlayer
-	 * @param string[] $theLines
-	 */
-	public function __construct(Block $theBlock, Player $thePlayer, array $theLines){
-		parent::__construct($theBlock);
-		$this->player = $thePlayer;
-		$this->lines = $theLines;
-	}
+        /** @var \pocketmine\Player */
+        private $player;
 
-	/**
-	 * @return Player
-	 */
-	public function getPlayer(){
-		return $this->player;
-	}
+        /** @var string[] */
+        private $lines = [];
 
-	/**
-	 * @return string[]
-	 */
-	public function getLines(){
-		return $this->lines;
-	}
+        /**
+         * @param Block    $theBlock
+         * @param Player   $thePlayer
+         * @param string[] $theLines
+         */
+        public function __construct(Block $theBlock, Player $thePlayer, array $theLines) {
+                parent::__construct($theBlock);
+                $this->player = $thePlayer;
+                $this->lines = $theLines;
+        }
 
-	/**
-	 * @param int $index 0-3
-	 *
-	 * @return string
-	 */
-	public function getLine($index){
-		return $this->lines[$index];
-	}
+        /**
+         * @return Player
+         */
+        public function getPlayer() {
+                return $this->player;
+        }
 
-	/**
-	 * @param int    $index 0-3
-	 * @param string $line
-	 */
-	public function setLine($index, $line){
-		$this->lines[$index] = $line;
-	}
+        /**
+         * @return string[]
+         */
+        public function getLines() {
+                return $this->lines;
+        }
+
+        /**
+         * @param int $index 0-3
+         *
+         * @return string
+         */
+        public function getLine($index) {
+                return $this->lines[$index];
+        }
+
+        /**
+         * @param int    $index 0-3
+         * @param string $line
+         */
+        public function setLine($index, $line) {
+                $this->lines[$index] = $line;
+        }
+
 }

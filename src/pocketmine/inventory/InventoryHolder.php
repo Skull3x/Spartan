@@ -17,16 +17,16 @@
  * @link http://www.pocketmine.net/
  *
  *
-*/
+ */
 
 namespace pocketmine\inventory;
 
-interface InventoryHolder{
+interface InventoryHolder {
 
-	/**
-	 * Get the object related inventory
-	 *
-	 * @return Inventory
-	 */
-	public function getInventory();
+        /**
+         * Get the object related inventory
+         *
+         * @return Inventory
+         */
+        public function getInventory();
 }

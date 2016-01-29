@@ -24,19 +24,20 @@ namespace pocketmine\event\player;
 use pocketmine\event\Cancellable;
 use pocketmine\Player;
 
-class PlayerToggleSprintEvent extends PlayerEvent implements Cancellable{
-	public static $handlerList = null;
+class PlayerToggleSprintEvent extends PlayerEvent implements Cancellable {
 
-	/** @var bool */
-	protected $isSprinting;
+        public static $handlerList = null;
 
-	public function __construct(Player $player, $isSprinting){
-		$this->player = $player;
-		$this->isSprinting = (bool) $isSprinting;
-	}
+        /** @var bool */
+        protected $isSprinting;
 
-	public function isSprinting(){
-		return $this->isSprinting;
-	}
+        public function __construct(Player $player, $isSprinting) {
+                $this->player = $player;
+                $this->isSprinting = (bool) $isSprinting;
+        }
+
+        public function isSprinting() {
+                return $this->isSprinting;
+        }
 
 }

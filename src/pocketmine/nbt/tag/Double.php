@@ -17,7 +17,7 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\nbt\tag;
 
@@ -25,17 +25,18 @@ use pocketmine\nbt\NBT;
 
 #include <rules/NBT.h>
 
-class Double extends NamedTag{
+class Double extends NamedTag {
 
-	public function getType(){
-		return NBT::TAG_Double;
-	}
+        public function getType() {
+                return NBT::TAG_Double;
+        }
 
-	public function read(NBT $nbt){
-		$this->value = $nbt->getDouble();
-	}
+        public function read(NBT $nbt) {
+                $this->value = $nbt->getDouble();
+        }
 
-	public function write(NBT $nbt){
-		$nbt->putDouble($this->value);
-	}
+        public function write(NBT $nbt) {
+                $nbt->putDouble($this->value);
+        }
+
 }

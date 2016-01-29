@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author: PeratX
  * Time: 2015/12/13 19:18
@@ -20,167 +21,164 @@ use pocketmine\Player;
 use pocketmine\tile\Chest as TileChest;
 use pocketmine\tile\Tile;
 
-class TrappedChest extends RedstoneSource{
-	protected $id = self::TRAPPED_CHEST;
+class TrappedChest extends RedstoneSource {
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+        protected $id = self::TRAPPED_CHEST;
 
-	public function getBoundingBox(){
-		if($this->boundingBox === null){
-			$this->boundingBox = $this->recalculateBoundingBox();
-		}
-		return $this->boundingBox;
-	}
+        public function __construct($meta = 0) {
+                $this->meta = $meta;
+        }
 
-	public function isSolid(){
-		return true;
-	}
+        public function getBoundingBox() {
+                if($this->boundingBox === null) {
+                        $this->boundingBox = $this->recalculateBoundingBox();
+                }
+                return $this->boundingBox;
+        }
 
-	public function canBeFlowedInto(){
-		return false;
-	}
+        public function isSolid() {
+                return true;
+        }
 
-	public function canBeActivated(){
-		return true;
-	}
+        public function canBeFlowedInto() {
+                return false;
+        }
 
-	public function getHardness(){
-		return 2.5;
-	}
+        public function canBeActivated() {
+                return true;
+        }
 
-	public function getResistance(){
-		return $this->getHardness() * 5;
-	}
+        public function getHardness() {
+                return 2.5;
+        }
 
-	public function getName(){
-		return "Trapped Chest";
-	}
+        public function getResistance() {
+                return $this->getHardness() * 5;
+        }
 
-	public function getToolType(){
-		return Tool::TYPE_AXE;
-	}
+        public function getName() {
+                return "Trapped Chest";
+        }
 
-	protected function recalculateBoundingBox(){
-		return new AxisAlignedBB(
-				$this->x + 0.0625,
-				$this->y,
-				$this->z + 0.0625,
-				$this->x + 0.9375,
-				$this->y + 0.9475,
-				$this->z + 0.9375
-		);
-	}
+        public function getToolType() {
+                return Tool::TYPE_AXE;
+        }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$faces = [
-				0 => 4,
-				1 => 2,
-				2 => 5,
-				3 => 3,
-		];
+        protected function recalculateBoundingBox() {
+                return new AxisAlignedBB(
+                        $this->x + 0.0625, $this->y, $this->z + 0.0625, $this->x + 0.9375, $this->y + 0.9475, $this->z + 0.9375
+                );
+        }
 
-		$chest = null;
-		$this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0];
+        public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null) {
+                $faces = [
+                    0 => 4,
+                    1 => 2,
+                    2 => 5,
+                    3 => 3,
+                ];
 
-		for($side = 2; $side <= 5; ++$side){
-			if(($this->meta === 4 or $this->meta === 5) and ($side === 4 or $side === 5)){
-				continue;
-			}elseif(($this->meta === 3 or $this->meta === 2) and ($side === 2 or $side === 3)){
-				continue;
-			}
-			$c = $this->getSide($side);
-			if($c instanceof Chest and $c->getDamage() === $this->meta){
-				$tile = $this->getLevel()->getTile($c);
-				if($tile instanceof TileChest and !$tile->isPaired()){
-					$chest = $tile;
-					break;
-				}
-			}
-		}
+                $chest = null;
+                $this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0];
 
-		$this->getLevel()->setBlock($block, $this, true, true);
-		$nbt = new Compound("", [
-				new Enum("Items", []),
-				new String("id", Tile::CHEST),
-				new Int("x", $this->x),
-				new Int("y", $this->y),
-				new Int("z", $this->z)
-		]);
-		$nbt->Items->setTagType(NBT::TAG_Compound);
+                for($side = 2; $side <= 5; ++$side) {
+                        if(($this->meta === 4 or $this->meta === 5) and ( $side === 4 or $side === 5)) {
+                                continue;
+                        } elseif(($this->meta === 3 or $this->meta === 2) and ( $side === 2 or $side === 3)) {
+                                continue;
+                        }
+                        $c = $this->getSide($side);
+                        if($c instanceof Chest and $c->getDamage() === $this->meta) {
+                                $tile = $this->getLevel()->getTile($c);
+                                if($tile instanceof TileChest and ! $tile->isPaired()) {
+                                        $chest = $tile;
+                                        break;
+                                }
+                        }
+                }
 
-		if($item->hasCustomName()){
-			$nbt->CustomName = new String("CustomName", $item->getCustomName());
-		}
+                $this->getLevel()->setBlock($block, $this, true, true);
+                $nbt = new Compound("", [
+                    new Enum("Items", []),
+                    new String("id", Tile::CHEST),
+                    new Int("x", $this->x),
+                    new Int("y", $this->y),
+                    new Int("z", $this->z)
+                ]);
+                $nbt->Items->setTagType(NBT::TAG_Compound);
 
-		if($item->hasCustomBlockData()){
-			foreach($item->getCustomBlockData() as $key => $v){
-				$nbt->{$key} = $v;
-			}
-		}
+                if($item->hasCustomName()) {
+                        $nbt->CustomName = new String("CustomName", $item->getCustomName());
+                }
 
-		$tile = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+                if($item->hasCustomBlockData()) {
+                        foreach($item->getCustomBlockData() as $key => $v) {
+                                $nbt->{$key} = $v;
+                        }
+                }
 
-		if($chest instanceof TileChest and $tile instanceof TileChest){
-			$chest->pairWith($tile);
-			$tile->pairWith($chest);
-		}
+                $tile = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
 
-		return true;
-	}
+                if($chest instanceof TileChest and $tile instanceof TileChest) {
+                        $chest->pairWith($tile);
+                        $tile->pairWith($chest);
+                }
 
-	public function onBreak(Item $item){
-		$t = $this->getLevel()->getTile($this);
-		if($t instanceof TileChest){
-			$t->unpair();
-		}
-		$this->getLevel()->setBlock($this, new Air(), true, true);
+                return true;
+        }
 
-		return true;
-	}
+        public function onBreak(Item $item) {
+                $t = $this->getLevel()->getTile($this);
+                if($t instanceof TileChest) {
+                        $t->unpair();
+                }
+                $this->getLevel()->setBlock($this, new Air(), true, true);
 
-	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player){
-			$top = $this->getSide(1);
-			if($top->isTransparent() !== true){
-				return true;
-			}
+                return true;
+        }
 
-			$t = $this->getLevel()->getTile($this);
-			$chest = null;
-			if($t instanceof TileChest){
-				$chest = $t;
-			}else{
-				$nbt = new Compound("", [
-						new Enum("Items", []),
-						new String("id", Tile::CHEST),
-						new Int("x", $this->x),
-						new Int("y", $this->y),
-						new Int("z", $this->z)
-				]);
-				$nbt->Items->setTagType(NBT::TAG_Compound);
-				$chest = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
-			}
+        public function onActivate(Item $item, Player $player = null) {
+                if($player instanceof Player) {
+                        $top = $this->getSide(1);
+                        if($top->isTransparent() !== true) {
+                                return true;
+                        }
 
-			if(isset($chest->namedtag->Lock) and $chest->namedtag->Lock instanceof String){
-				if($chest->namedtag->Lock->getValue() !== $item->getCustomName()){
-					return true;
-				}
-			}
+                        $t = $this->getLevel()->getTile($this);
+                        $chest = null;
+                        if($t instanceof TileChest) {
+                                $chest = $t;
+                        } else {
+                                $nbt = new Compound("", [
+                                    new Enum("Items", []),
+                                    new String("id", Tile::CHEST),
+                                    new Int("x", $this->x),
+                                    new Int("y", $this->y),
+                                    new Int("z", $this->z)
+                                ]);
+                                $nbt->Items->setTagType(NBT::TAG_Compound);
+                                $chest = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+                        }
 
-			if($player->isCreative()){
-				return true;
-			}
-			$player->addWindow($chest->getInventory());
-		}
+                        if(isset($chest->namedtag->Lock) and $chest->namedtag->Lock instanceof String) {
+                                if($chest->namedtag->Lock->getValue() !== $item->getCustomName()) {
+                                        return true;
+                                }
+                        }
 
-		return true;
-	}
+                        if($player->isCreative()) {
+                                return true;
+                        }
+                        $player->addWindow($chest->getInventory());
+                }
 
-	public function getDrops(Item $item){
-		return [
-				[$this->id, 0, 1],
-		];
-	}
+                return true;
+        }
+
+        public function getDrops(Item $item) {
+                return [
+                    [$this->id, 0, 1],
+                ];
+        }
+
 }

@@ -17,10 +17,10 @@
  * @link http://www.pocketmine.net/
  * 
  *
-*/
+ */
 
 namespace pocketmine\entity;
 
-class Skeleton extends Monster implements ProjectileSource{
-
+class Skeleton extends Monster implements ProjectileSource {
+        
 }
