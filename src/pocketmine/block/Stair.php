@@ -131,19 +131,7 @@ abstract class Stair extends Transparent {
 
                 return true;
         }
-
-        public function getDrops(Item $item) {
-                if($item->isPickaxe() >= Tool::TIER_WOODEN) {
-                        return [
-                            [$this->getId(), 0, 1],
-                        ];
-                } else {
-                        return [];
-                }
-        }
-
-<<<<<<< HEAD
-=======
+        
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			return [
@@ -153,5 +141,4 @@ abstract class Stair extends Transparent {
 			return [];
 		}
 	}
->>>>>>> PocketMine/master
 }
