@@ -96,10 +96,27 @@ class Cake extends Transparent {
                                 $this->getLevel()->setBlock($this, $this, true);
                         }
 
+<<<<<<< HEAD
                         return true;
                 }
 
                 return false;
         }
 
+=======
+			if(!$ev->isCancelled()){
+				if($this->meta >= 0x06){
+					$this->getLevel()->setBlock($this, new Air(), true);
+				}else{
+					$this->getLevel()->setBlock($this, $this, true);
+				}
+				
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+>>>>>>> PocketMine/master
 }
