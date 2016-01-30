@@ -1237,6 +1237,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
         protected function checkNearEntities($tickDiff) {
                 foreach($this->level->getNearbyEntities($this->boundingBox->grow(1, 0.5, 1), $this) as $entity) {
+                        if(!$this->isAlive() or ! $this->spawned) {
+                                continue;
+                        }
                         $entity->scheduleUpdate();
 
                         if(!$entity->isAlive()) {
@@ -1245,7 +1248,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                         if($entity instanceof Arrow and $entity->hadCollision) {
                                 $item = Item::get(Item::ARROW, 0, 1);
-                                if($this->isSurvival() and ! $this->inventory->canAddItem($item)) {
+                                
+                                if($this->isSurvival() and !$this->inventory->canAddItem($item)) {
                                         continue;
                                 }
 
@@ -1269,9 +1273,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                         } elseif($entity instanceof DroppedItem) {
                                 if($entity->getPickupDelay() <= 0) {
                                         $item = $entity->getItem();
-
                                         if($item instanceof Item) {
-                                                if($this->isSurvival() and ! $this->inventory->canAddItem($item)) {
+                                                if($this->isSurvival() and !$this->inventory->canAddItem($item)) {
                                                         continue;
                                                 }
 
