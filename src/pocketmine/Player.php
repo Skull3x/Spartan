@@ -1248,8 +1248,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                         if($entity instanceof Arrow and $entity->hadCollision) {
                                 $item = Item::get(Item::ARROW, 0, 1);
-                                
-                                if($this->isSurvival() and !$this->inventory->canAddItem($item)) {
+
+                                if($this->isSurvival() and ! $this->inventory->canAddItem($item)) {
                                         continue;
                                 }
 
@@ -1274,7 +1274,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 if($entity->getPickupDelay() <= 0) {
                                         $item = $entity->getItem();
                                         if($item instanceof Item) {
-                                                if($this->isSurvival() and !$this->inventory->canAddItem($item)) {
+                                                if($this->isSurvival() and ! $this->inventory->canAddItem($item)) {
                                                         continue;
                                                 }
 
@@ -1686,32 +1686,32 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
         public function eat() {
                 $items = [ //TODO: move this to item classes
-                    Item::APPLE => 4,
-                    Item::MUSHROOM_STEW => 10,
-                    Item::BEETROOT_SOUP => 10,
-                    Item::BREAD => 5,
-                    Item::RAW_PORKCHOP => 3,
-                    Item::COOKED_PORKCHOP => 8,
-                    Item::RAW_BEEF => 3,
-                    Item::STEAK => 8,
-                    Item::COOKED_CHICKEN => 6,
-                    Item::RAW_CHICKEN => 2,
-                    Item::MELON_SLICE => 2,
-                    Item::GOLDEN_APPLE => 2,
-                    Item::PUMPKIN_PIE => 8,
-                    Item::CARROT => 4,
-                    Item::POTATO => 1,
-                    Item::BAKED_POTATO => 6,
-                    Item::COOKIE => 2,
+                    Item::APPLE => 0,
+                    Item::MUSHROOM_STEW => 0,
+                    Item::BEETROOT_SOUP => 0,
+                    Item::BREAD => 0,
+                    Item::RAW_PORKCHOP => 0,
+                    Item::COOKED_PORKCHOP => 0,
+                    Item::RAW_BEEF => 0,
+                    Item::STEAK => 0,
+                    Item::COOKED_CHICKEN => 0,
+                    Item::RAW_CHICKEN => 0,
+                    Item::MELON_SLICE => 0,
+                    Item::GOLDEN_APPLE => 4,
+                    Item::PUMPKIN_PIE => 0,
+                    Item::CARROT => 0,
+                    Item::POTATO => 0,
+                    Item::BAKED_POTATO => 0,
+                    Item::COOKIE => 0,
                     Item::COOKED_FISH => [
-                        0 => 5,
-                        1 => 6
+                        0 => 0,
+                        1 => 0
                     ],
                     Item::RAW_FISH => [
-                        0 => 2,
-                        1 => 2,
-                        2 => 1,
-                        3 => 1
+                        0 => 0,
+                        1 => 0,
+                        2 => 0,
+                        3 => 0
                     ],
                 ];
                 $slot = $this->inventory->getItemInHand();
@@ -1737,16 +1737,15 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                         --$slot->count;
                         $this->inventory->setItemInHand($slot);
-                        if($slot->getId() === Item::MUSHROOM_STEW or $slot->getId() === Item::BEETROOT_SOUP) {
-                                $this->inventory->addItem(Item::get(Item::BOWL, 0, 1));
-                        } elseif($slot->getId() === Item::RAW_FISH and $slot->getDamage() === 3) { //Pufferfish
-                                //$this->addEffect(Effect::getEffect(Effect::HUNGER)->setAmplifier(2)->setDuration(15 * 20));
-                                $this->addEffect(Effect::getEffect(Effect::NAUSEA)->setAmplifier(1)->setDuration(15 * 20));
-                                $this->addEffect(Effect::getEffect(Effect::POISON)->setAmplifier(3)->setDuration(60 * 20));
-                        } elseif($slot->getId() === Item::GOLDEN_APPLE) {
-                                $effects = $slot->getEffects();
-                                foreach($effects as $effect) {
-                                        $this->addEffect($effect);
+                        if($slot->getId() === Item::GOLDEN_APPLE) {
+                                if($slot->getDamage() === 0) {
+                                        $this->addEffect(Effect::getEffect(Effect::HEALTH_BOOST)->setAmplifier(0)->setDuration(20 * 60 * 2));
+                                        $this->addEffect(Effect::getEffect(Effect::REGENERATION)->setAmplifier(1)->setDuration(20 * 5));
+                                } elseif($slot->getDamage() >= 1) {
+                                        $this->addEffect(Effect::getEffect(Effect::HEALTH_BOOST)->setAmplifier(0)->setDuration(20 * 60 * 2));
+                                        $this->addEffect(Effect::getEffect(Effect::REGENERATION)->setAmplifier(4)->setDuration(20 * 30));
+                                        $this->addEffect(Effect::getEffect(Effect::FIRE_RESISTANCE)->setAmplifier(0)->setDuration(20 * 60 * 5));
+                                        //$this->addEffect(Effect::getEffect(Effect::RESISTANCE)->setAmplifier(0)->setDuration(20 * 60 * 5));
                                 }
                         }
                 }
