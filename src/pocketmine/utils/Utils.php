@@ -30,7 +30,7 @@ use pocketmine\ThreadManager;
 /**
  * Big collection of functions
  */
-<<<<<<< HEAD
+
 class Utils {
 
         public static $online = true;
@@ -551,7 +551,9 @@ class Utils {
 
                 return $ret;
         }
-=======
+
+}
+
 class Utils{
 	public static $online = true;
 	public static $ip = false;
@@ -1075,6 +1077,5 @@ class Utils{
 
 		return $ret;
 	}
->>>>>>> PocketMine/master
 
 }

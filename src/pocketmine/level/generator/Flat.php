@@ -38,7 +38,6 @@ use pocketmine\level\generator\populator\Populator;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
-<<<<<<< HEAD
 class Flat extends Generator {
 
         /** @var ChunkManager */
@@ -187,8 +186,9 @@ class Flat extends Generator {
         public function getSpawn() {
                 return new Vector3(128, $this->floorLevel, 128);
         }
+        
+}
 
-=======
 class Flat extends Generator{
 	/** @var ChunkManager */
 	private $level;
@@ -333,6 +333,6 @@ class Flat extends Generator{
 
 	public function getSpawn(){
 		return new Vector3(128, $this->floorLevel, 128);
-	}
->>>>>>> PocketMine/master
+        }
+
 }

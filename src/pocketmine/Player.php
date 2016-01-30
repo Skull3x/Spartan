@@ -2947,7 +2947,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 $this->removeWindow($window);
                         }
 
-<<<<<<< HEAD
                         foreach($this->usedChunks as $index => $d) {
                                 Level::getXZ($index, $chunkX, $chunkZ);
                                 $this->level->unregisterChunkLoader($this, $chunkX, $chunkZ);
@@ -3507,7 +3506,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                 $batch->isEncoded = true;
                 return $batch;
         }
-=======
+        
 	/** @var Vector3 */
 	public $speed = null;
 
@@ -6902,6 +6901,5 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$batch->isEncoded = true;
 		return $batch;
 	}
->>>>>>> PocketMine/master
 
 }

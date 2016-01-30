@@ -30,17 +30,15 @@ class PlayerQuitEvent extends PlayerEvent {
 
         public static $handlerList = null;
 
-<<<<<<< HEAD
         /** @var string */
         protected $quitMessage;
         protected $autoSave = true;
-=======
+        
 	public function __construct(Player $player, $quitMessage, $autoSave = true){
 		$this->player = $player;
 		$this->quitMessage = $quitMessage;
 		$this->autoSave = $autoSave;
 	}
->>>>>>> PocketMine/master
 
         public function __construct(Player $player, $quitMessage, $autoSave = true) {
                 $this->player = $player;
@@ -60,11 +58,8 @@ class PlayerQuitEvent extends PlayerEvent {
                 return $this->autoSave;
         }
 
-<<<<<<< HEAD
         public function setAutoSave($value = true) {
                 $this->autoSave = (bool) $value;
         }
 
-=======
->>>>>>> PocketMine/master
 }

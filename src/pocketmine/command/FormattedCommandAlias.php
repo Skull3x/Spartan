@@ -26,7 +26,6 @@ use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 
-<<<<<<< HEAD
 class FormattedCommandAlias extends Command {
 
         private $formatStrings = [];
@@ -162,7 +161,7 @@ class FormattedCommandAlias extends Command {
         }
 
 }
-=======
+
 class FormattedCommandAlias extends Command{
 	private $formatStrings = [];
 
@@ -297,4 +296,3 @@ class FormattedCommandAlias extends Command{
 	}
 
 }
->>>>>>> PocketMine/master

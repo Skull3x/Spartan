@@ -172,8 +172,6 @@ class BaseLang {
                 return $newString;
         }
 
-<<<<<<< HEAD
-=======
 	public function __construct($lang, $path = null, $fallback = self::FALLBACK_LANGUAGE){
 
 		$this->langName = strtolower($lang);
@@ -313,5 +311,5 @@ class BaseLang {
 
 		return $newString;
 	}
->>>>>>> PocketMine/master
+
 }

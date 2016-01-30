@@ -67,8 +67,7 @@ namespace {
 }
 
 namespace pocketmine {
-<<<<<<< HEAD
-=======
+
 	use pocketmine\utils\Binary;
 	use pocketmine\utils\MainLogger;
 	use pocketmine\utils\ServerKiller;
@@ -486,7 +485,6 @@ namespace pocketmine {
 	echo Terminal::$FORMAT_RESET . "\n";
 
 	exit(0);
->>>>>>> PocketMine/master
 
         use pocketmine\utils\Binary;
         use pocketmine\utils\MainLogger;
