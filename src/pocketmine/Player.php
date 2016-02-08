@@ -1248,8 +1248,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                         if($entity instanceof Arrow and $entity->hadCollision) {
                                 $item = Item::get(Item::ARROW, 0, 1);
-                                
-                                if($this->isSurvival() and !$this->inventory->canAddItem($item)) {
+
+                                if($this->isSurvival() and ! $this->inventory->canAddItem($item)) {
                                         continue;
                                 }
 
@@ -1274,7 +1274,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 if($entity->getPickupDelay() <= 0) {
                                         $item = $entity->getItem();
                                         if($item instanceof Item) {
-                                                if($this->isSurvival() and !$this->inventory->canAddItem($item)) {
+                                                if($this->isSurvival() and ! $this->inventory->canAddItem($item)) {
                                                         continue;
                                                 }
 
@@ -1386,8 +1386,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
                 //Max time in air
                 $time = 20 * 8; //8 seconds
-                if($this->inAirTicks >= $time) {
-                        $this->kick("Please disable flying mods to play.", false);
+                if(!$this->isCreative()) {
+                        if($this->inAirTicks >= $time) {
+                                $this->kick("Please disable flying mods to play.", false);
+                        }
                 }
         }
 
@@ -1686,33 +1688,35 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
         public function eat() {
                 $items = [ //TODO: move this to item classes
-                    Item::APPLE => 0,
-                    Item::MUSHROOM_STEW => 0,
-                    Item::BEETROOT_SOUP => 0,
-                    Item::BREAD => 0,
-                    Item::RAW_PORKCHOP => 0,
-                    Item::COOKED_PORKCHOP => 0,
-                    Item::RAW_BEEF => 0,
-                    Item::STEAK => 0,
-                    Item::COOKED_CHICKEN => 0,
-                    Item::RAW_CHICKEN => 0,
-                    Item::MELON_SLICE => 0,
+                    Item::APPLE => 4,
+                    Item::MUSHROOM_STEW => 6,
+                    Item::BEETROOT_SOUP => 5,
+                    Item::BREAD => 5,
+                    Item::RAW_PORKCHOP => 2,
+                    Item::COOKED_PORKCHOP => 8,
+                    Item::RAW_BEEF => 3,
+                    Item::STEAK => 8,
+                    Item::COOKED_CHICKEN => 6,
+                    Item::RAW_CHICKEN => 2,
+                    Item::MELON_SLICE => 2,
                     Item::GOLDEN_APPLE => 4,
-                    Item::PUMPKIN_PIE => 0,
-                    Item::CARROT => 0,
-                    Item::POTATO => 0,
-                    Item::BAKED_POTATO => 0,
-                    Item::COOKIE => 0,
+                    Item::PUMPKIN_PIE => 8,
+                    Item::CARROT => 3,
+                    Item::POTATO => 1,
+                    Item::BAKED_POTATO => 5,
+                    Item::COOKIE => 2,
                     Item::COOKED_FISH => [
-                        0 => 0,
-                        1 => 0
+                        0 => 5,
+                        1 => 6
                     ],
                     Item::RAW_FISH => [
-                        0 => 0,
-                        1 => 0,
-                        2 => 0,
-                        3 => 0
+                        0 => 2,
+                        1 => 2,
+                        2 => 1,
+                        3 => 1
                     ],
+                    Item::POTION => 0,
+                    Item::ROTTEN_FLESH => 4,
                 ];
                 $slot = $this->inventory->getItemInHand();
                 if(isset($items[$slot->getId()])) {
