@@ -1807,21 +1807,21 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                         break;
                                 }
 
-                                if($packet->protocol1 < 38 or $packet->protocol1 > 39) {
-                                        if($packet->protocol1 < 38) {
+                                if($packet->protocol1 !== ProtocolInfo::CURRENT_PROTOCOL) {
+                                        if($packet->protocol1 < ProtocolInfo::CURRENT_PROTOCOL) {
                                                 $message = "disconnectionScreen.outdatedClient";
 
                                                 $pk = new PlayStatusPacket();
                                                 $pk->status = PlayStatusPacket::LOGIN_FAILED_CLIENT;
                                                 $this->directDataPacket($pk);
-                                        } elseif($packet->protocol1 > 39) {
+                                        } else {
                                                 $message = "disconnectionScreen.outdatedServer";
 
                                                 $pk = new PlayStatusPacket();
                                                 $pk->status = PlayStatusPacket::LOGIN_FAILED_SERVER;
                                                 $this->directDataPacket($pk);
                                         }
-                                        $this->close("", $message, false);
+                                        $this->close(TextFormat::RED . "", $message, false);
 
                                         break;
                                 }
