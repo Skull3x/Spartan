@@ -19,7 +19,7 @@
  *
 */
 
-namespace milk\entitymanager\entity\projectile;
+namespace pocketmine\entity;
 
 use pocketmine\level\format\FullChunk;
 use pocketmine\level\particle\CriticalParticle;
